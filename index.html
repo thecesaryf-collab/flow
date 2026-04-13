@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header id="top-bar">
+        <div id="logo-text">LOGO</div>
+        <div id="btn-menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+    </header>
+
+    <main id="app-container">
+        <section id="view-inicio" class="view active">
+            <div id="content-inicio" style="display: flex; flex-direction: column; height: 100%;">
+                <h1 id="greeting-title" class="animated-title">Cargando...</h1>
+                <div id="greeting-subtitle" class="system-bubble hidden">¿Cómo está yendo tu día?</div>
+
+                <div id="input-zone" class="input-wrapper mt-auto hidden">
+                    <input type="text" id="daily-input" placeholder="Escribe aquí..." autocomplete="off" maxlength="150">
+                    <button id="btn-send" class="btn-send">
+                        <span id="btn-icon">➤</span>
+                        <div id="btn-spinner" class="spinner-small hidden"></div>
+                    </button>
+                </div>
+
+                <div id="chat-zone" class="chat-container hidden"></div>
+            </div>
+        </section>
+
+        <section id="view-habitos" class="view">
+            <h1>Hábitos</h1>
+        </section>
+
+        <section id="view-entreno" class="view">
+            <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+                
+                <h1 id="entreno-title" class="animated-title">Rendimiento<br>de...</h1>
+                
+                <div id="loading-entreno" class="spinner hidden" style="margin: auto;"></div>
+                
+
+                <div id="content-entreno" class="hidden" style="display: flex; flex-direction: column; flex: 1;">
+                    
+                    <div id="entreno-state-0" class="hidden">
+                        <div class="system-bubble">Aún no tienes rutinas.</div>
+                        <button id="btn-start-routine" class="btn-giant-black" style="margin-top: 10px;">Crea tu rutina</button>
+                    </div>
+
+                    <div id="entreno-state-1" class="hidden" style="display: flex; flex-direction: column; flex: 1;">
+                        
+                        <div class="calendar-card">
+                            <div id="calendar-header" class="calendar-header">Cargando fecha...</div>
+                            <div id="week-calendar" class="week-calendar scrollable-x"></div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            
+                            <div class="filters-col">
+                                <div class="dropdown-container" id="dd-routine">
+                                    <div class="custom-select-btn" id="btn-select-routine">
+                                        <span class="sel-text">Cargando rutinas...</span> <span class="arrow">▼</span>
+                                    </div>
+                                    <div class="dropdown-menu hidden" id="menu-routine"></div>
+                                </div>
+                                
+                                <div class="dropdown-container" id="dd-exercise">
+                                    <div class="custom-select-btn" id="btn-select-exercise">
+                                        <span class="sel-text">Cargando ejercicios...</span> <span class="arrow">▼</span>
+                                    </div>
+                                    <div class="dropdown-menu hidden" id="menu-exercise"></div>
+                                </div>
+
+                                <div class="dropdown-container" id="dd-timeframe">
+                                    <div class="custom-select-btn" id="btn-select-timeframe">
+                                        <span class="sel-text">Semanal</span> <span class="arrow">▼</span>
+                                    </div>
+                                    <div class="dropdown-menu hidden" id="menu-timeframe">
+                                        <div class="dropdown-item" data-val="semanal">Semanal</div>
+                                        <div class="dropdown-item" data-val="mensual">Mensual</div>
+                                        <div class="dropdown-item" data-val="anual">Anual</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-header-row">
+                                <div id="custom-chart-legend" class="custom-chart-legend"></div>
+                                <div class="chart-toggles">
+                                    <button id="btn-mode-kg" class="chart-toggle active">KG</button>
+                                    <button id="btn-mode-int" class="chart-toggle">%</button>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container" style="position: relative; flex: 1; width: 100%; min-height: 200px;">
+                                <canvas id="progress-chart"></canvas>
+                            </div>
+
+                        </div>
+
+                        <button id="btn-main-action" class="btn-giant-black mt-auto">EMPEZAR ENTRENO</button>
+                    </div>
+
+                    <div id="entreno-state-selector" class="hidden" style="display: flex; flex-direction: column; flex: 1; justify-content: center;">
+                        <h2 style="font-size: 30px; font-weight: 900; letter-spacing: -1px; text-align: center; margin-bottom: 30px;">¿Qué vas a entrenar hoy?</h2>
+                        <div id="routine-buttons-cascade" style="display: flex; flex-direction: column; gap: 15px; padding: 0 20px;">
+                            </div>
+                    </div>
+
+                    <div id="entreno-state-2-grid" class="hidden" style="display: flex; flex-direction: column; flex: 1; margin-top: 20px;">
+                        <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 20px;">Resumen del Entreno</h2>
+                        <div id="summary-grid" class="summary-grid-layout">
+                            </div>
+                        <button id="btn-edit-entreno" class="btn-giant-black mt-auto" style="margin-top: 30px;">EDITAR ENTRENAMIENTO</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="view-comida" class="view">
+            <h1>Alimentación</h1>
+        </section>
+    </main>
+
+    <div id="nav-bg">
+        <div id="swipe-container" class="hidden" style="height: 100%; display: flex; flex-direction: column;">
+            
+            <div class="swipe-header">
+                <button class="btn-back-swipe" onclick="salirModoCartas()">←</button>
+                <span id="swipe-header-title" class="swipe-title">Rutina de Pierna</span>
+            </div>
+
+            <div id="swipe-spinner" class="hidden" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 999; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+                <div class="spinner" style="border-left-color: var(--bg-yellow);"></div>
+            </div>
+
+            <div id="card-stack" class="card-stack-container">
+                </div>
+            
+        </div>
+        <div id="entreno-form" class="hidden">
+            <div id="form-header">
+                <span id="form-title">TU RUTINA</span>
+                <button id="btn-close-form">✕</button>
+            </div>
+
+            <div class="form-step" id="step-name">
+                <input type="text" id="routine-name" class="cream-input" placeholder="¿Cómo llamamos a esta rutina?" autocomplete="off" maxlength="30">
+            </div>
+            
+            <div class="form-step hidden" id="step-color" style="margin-top: 25px;">
+                <p class="step-label">Elige un color</p>
+                <div class="color-picker">
+                    <div class="color-circle" style="background: #FF3B30;" data-color="#FF3B30"></div>
+                    <div class="color-circle" style="background: #007AFF;" data-color="#007AFF"></div>
+                    <div class="color-circle" style="background: #34C759;" data-color="#34C759"></div>
+                    <div class="color-circle" style="background: #AF52DE;" data-color="#AF52DE"></div>
+                    <div class="color-circle" style="background: #FF9500;" data-color="#FF9500"></div>
+                </div>
+            </div>
+
+            <div class="form-step hidden" id="step-exercises" style="margin-top: 25px;">
+                <p class="step-label">Añade tus ejercicios <span id="exercise-counter">0/8</span></p>
+                <div id="exercise-pills-container">
+                    <div id="btn-add-exercise" class="exercise-pill dotted">+ Añadir ejercicio</div>
+                </div>
+            </div>
+
+            <button id="btn-save-routine" class="btn-giant-yellow hidden mt-auto">GUARDAR RUTINA</button>
+        </div>
+    </div>
+
+    <nav id="bottom-nav">
+        <div class="nav-item active" data-target="view-inicio">
+            <svg viewBox="0 0 24 24" class="icon-outline"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        </div>
+        <div class="nav-item" data-target="view-habitos">
+            <svg viewBox="0 0 24 24" class="icon-outline"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div class="nav-item" data-target="view-entreno">
+            <svg viewBox="0 0 24 24" class="icon-outline"><path d="M12 2c0 0-4 3.5-4 9a4 4 0 0 0 8 0c0-5.5-4-9-4-9z"/><path d="M12 22a6 6 0 0 1-6-6c0-2.5 2-5 3-6 0 0 .5 2 2 2 2-2 3-4.5 3-4.5 1 2 2 4.5 2 7a6 6 0 0 1-4 6z"/></svg>
+        </div>
+        <div class="nav-item" data-target="view-comida">
+            <svg viewBox="0 0 24 24" class="icon-outline"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5h-2c0-3-1-4-2-5Z"/></svg>
+        </div>
+    </nav>
+
+    <div id="bottom-sheet" class="hidden">
+        <div id="sheet-overlay"></div>
+        <div id="sheet-content">
+            <div class="sheet-drag-bar"></div>
+            <h3 class="sheet-title" id="sheet-title">Catálogo</h3>
+            <input type="text" id="search-exercise" class="search-input" placeholder="Buscar..." autocomplete="off">
+            <div id="catalog-list"></div>
+        </div>
+    </div>
+
+    <script src="chartEngine.js"></script>
+    <script src="swipeEngine.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

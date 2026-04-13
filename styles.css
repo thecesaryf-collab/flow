@@ -1,0 +1,335 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+:root {
+    --bg-yellow: #FFDE59; 
+    --c-cream: #FFF4E0; 
+    --c-black: #111111; 
+    --c-white: #FFFFFF;
+    --c-blue-check: #34B7F1; 
+    --c-gray: #D1D1D1;
+}
+
+html, body { width: 100%; max-width: 100vw; overflow-x: hidden; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { background-color: var(--bg-yellow); color: var(--c-black); height: 100vh; position: relative; }
+
+/* --- TOP BAR --- */
+#top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 25px 25px 0 25px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+#logo-text { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; }
+#btn-menu { color: var(--c-black); cursor: pointer; display: flex; align-items: center; }
+
+/* --- CONTENEDOR PRINCIPAL --- */
+#app-container { height: 100vh; padding: 85px 15px 135px 15px; overflow-y: auto; overflow-x: hidden; position: relative; z-index: 10; }
+.view { display: none; height: 100%; flex-direction: column; }
+.view.active { display: flex; }
+
+/* --- TÍTULOS Y DESENFOQUE --- */
+h1 { font-size: clamp(60px, 20vw, 110px); font-weight: 900; letter-spacing: -3px; line-height: 0.85; margin-bottom: 25px; white-space: pre-line; word-break: break-word; overflow-wrap: break-word; max-width: 100%; transition: all 0.4s ease; padding: 0 5px; }
+
+/* Reducción específica del título de la pestaña de Entrenamiento */
+#entreno-title { 
+    font-size: clamp(40px, 14vw, 75px); 
+    line-height: 0.9; 
+    margin-top: -15px;     
+    margin-bottom: 5px; /* Reducido al máximo */
+}
+
+.animated-title { animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+.blurred-bg { filter: blur(8px); opacity: 0.3; transform: scale(0.98); pointer-events: none; } 
+
+/* --- BOCADILLO SISTEMA --- */
+.system-bubble { background-color: var(--c-black); color: var(--c-white); padding: 12px 24px; border-radius: 25px; border-bottom-left-radius: 5px; display: inline-block; align-self: flex-start; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 25px; transition: 0.4s; margin-left: 5px;}
+
+/* --- CHAT E INPUT --- */
+.input-wrapper { background: var(--c-cream); display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 20px; border-radius: 40px; margin-top: auto; }
+#daily-input { flex: 1; border: none; background: transparent; font-size: 16px; outline: none; font-weight: 600; color: var(--c-black); }
+#daily-input::placeholder { color: #9A9A9A; }
+.btn-send { background: var(--c-black); color: var(--c-white); border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: 0.2s; }
+.btn-send:active { transform: scale(0.92); }
+.chat-container { display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
+.chat-day { font-size: 11px; color: #998535; text-align: center; margin-bottom: -10px; font-weight: 800; text-transform: uppercase; }
+.chat-bubble { background: var(--c-white); color: var(--c-black); padding: 14px 20px; border-radius: 25px; border-bottom-right-radius: 5px; align-self: flex-end; max-width: 85%; display: flex; align-items: center; gap: 8px; }
+.chat-text { font-size: 16px; font-weight: 700; line-height: 1.3; }
+.chat-status { color: var(--c-blue-check); font-size: 18px; line-height: 1; margin-bottom: -2px; font-weight: 400; }
+
+
+/* --- ESTADO 1: DASHBOARD CON MÁRGENES FINOS --- */
+.calendar-card {
+    background: var(--c-cream); border-radius: 24px; 
+    padding: 12px 15px 5px 15px; 
+    margin-bottom: 12px; 
+    display: flex; flex-direction: column;
+    margin-left: -5px; margin-right: -5px;
+    flex-shrink: 0;
+}
+
+.calendar-header {
+    font-size: 13px; font-weight: 800; color: var(--c-black);
+    text-align: center; margin-bottom: 5px; 
+    text-transform: uppercase;
+    letter-spacing: -0.5px; opacity: 0.6;
+}
+
+.week-calendar.scrollable-x {
+    display: flex; gap: 8px; align-items: center; 
+    padding: 5px 10px; 
+    background: var(--c-cream); margin-bottom: 0px; 
+    overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none;
+}
+.week-calendar.scrollable-x::-webkit-scrollbar { display: none; }
+
+/* COMPACTACIÓN MÁXIMA DE LA TARJETA DEL GRÁFICO */
+.dashboard-card {
+    background: var(--c-white); 
+    padding: 10px 15px; /* Relleno interior más fino */
+    display: flex; flex-direction: column; 
+    gap: 6px; /* Menos hueco entre elementos */
+    margin-bottom: 10px; /* Menos margen inferior */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+    border-radius: 24px; margin-left: -5px; margin-right: -5px;
+    flex: 1; 
+}
+
+.cal-day { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 40px; cursor: pointer; flex-shrink: 0;}
+.cal-name { font-size: 12px; font-weight: 800; color: #A09E95; }
+.cal-num { 
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; font-size: 16px; font-weight: 800; color: var(--c-black); transition: 0.2s;
+}
+/* Cuadrado amarillo para el día seleccionado */
+.cal-day.active .cal-num { border: 2px solid var(--bg-yellow); background: transparent; }
+.cal-day.active .cal-name { color: var(--c-black); }
+
+/* Checkmark en lugar del punto */
+.cal-check { font-size: 14px; font-weight: 900; color: transparent; margin-top: -2px; transition: 0.2s; }
+.cal-day.trained .cal-check { color: var(--c-black); } /* Check negro por defecto */
+.cal-day.active.trained .cal-check { color: var(--bg-yellow); } /* Check amarillo si está seleccionado */
+
+/* Controles Verticales y Pastillas Negras */
+.filters-col { display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 10; } /* Hueco reducido */
+.dropdown-container { position: relative; width: 100%; }
+
+.custom-select-btn {
+    background: var(--c-black); /* Fondo negro */
+    color: var(--c-white);      /* Texto blanco */
+    padding: 8px 15px;          /* Más finas */
+    border-radius: 12px;
+    font-weight: 700; font-size: 12px; /* Letra ajustada */
+    display: flex; justify-content: space-between;
+    align-items: center; cursor: pointer; 
+    transition: 0.2s; border: 1px solid transparent;
+}
+.custom-select-btn:active { transform: scale(0.98); opacity: 0.8; }
+.custom-select-btn.open { border-color: var(--bg-yellow); } /* Borde amarillo al abrir para dar feedback */
+.custom-select-btn .arrow { color: rgba(255,255,255,0.5); font-size: 10px; transition: 0.3s; } /* Flecha semi-transparente */
+.custom-select-btn.open .arrow { transform: rotate(180deg); color: var(--bg-yellow); }
+
+/* Menú Desplegable Flotante (Se queda blanco) */
+.dropdown-menu {
+    position: absolute; top: calc(100% + 5px); left: 0; width: 100%;
+    background: var(--c-white); border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1); z-index: 200; 
+    overflow: hidden; max-height: 180px; overflow-y: auto;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.dropdown-item {
+    padding: 12px 15px; font-size: 13px; font-weight: 600; cursor: pointer;
+    border-bottom: 1px solid #F0F0F0; color: var(--c-black); transition: 0.2s;
+}
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:active { background: #F9F9F9; }
+
+/* Leyenda y Toggles ultra juntos */
+.chart-header-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 2px; margin-bottom: 2px; /* Reducido al mínimo */
+}
+.chart-toggles {
+    display: flex; background: #F4F4F4; border-radius: 20px; padding: 3px;
+}
+.chart-toggle {
+    background: transparent; border: none; padding: 5px 12px;
+    border-radius: 15px; font-size: 11px; font-weight: 800;
+    color: #A09E95; cursor: pointer; transition: 0.2s;
+}
+.chart-toggle.active {
+    background: var(--c-black); color: var(--c-white);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Leyenda personalizada del gráfico */
+.custom-chart-legend {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.legend-item {
+    display: flex; align-items: center; gap: 5px; 
+    font-size: 11px; font-weight: 800; color: #A09E95; text-transform: uppercase;
+}
+.legend-color-box {
+    width: 12px; height: 12px; border-radius: 4px; 
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* SPINNERS */
+.spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--c-black); border-radius: 50%; width: 45px; height: 45px; animation: spin 0.8s linear infinite;}
+.spinner-small { border: 2px solid rgba(255,255,255,0.3); border-left-color: var(--c-white); border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- EL TELÓN NEGRO --- */
+#nav-bg { position: fixed; bottom: 0; left: 0; width: 100vw; height: 90px; background-color: var(--c-black); border-radius: 35px 35px 0 0; z-index: 90; transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+#nav-bg.expanded { height: 85vh; overflow-y: auto; }
+#entreno-form { padding: 30px 25px 120px 25px; display: flex; flex-direction: column; min-height: 100%; }
+
+/* --- BARRA DE NAVEGACIÓN --- */
+#bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 90px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px 15px 10px; z-index: 100; pointer-events: none; }
+.nav-item { display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; cursor: pointer; transition: 0.3s; pointer-events: auto; }
+.nav-item svg { width: 28px; height: 28px; transition: 0.3s; fill: transparent; stroke: rgba(255,255,255,0.4); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nav-item.active svg { fill: var(--c-white); stroke: var(--c-white); transform: translateY(-3px) scale(1.1); }
+
+/* --- UI FORMULARIO --- */
+#form-header { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
+#form-title { color: var(--c-white); font-weight: 800; font-size: 15px; letter-spacing: 1px; }
+#btn-close-form { position: absolute; right: 0; background: none; border: none; color: var(--c-white); font-size: 22px; font-weight: bold; cursor: pointer; opacity: 0.6; transition: 0.2s; }
+#btn-close-form:active { transform: scale(0.8); opacity: 1; }
+
+/* Botones Gigantes - Letra ajustada a 15px para evitar recortes */
+.btn-giant-black { background: var(--c-black); color: var(--c-white); border: none; width: 100%; padding: 16px; border-radius: 30px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+.btn-giant-black:active { transform: scale(0.96); }
+.btn-giant-yellow { background: var(--bg-yellow); color: var(--c-black); border: none; width: 100%; padding: 16px; border-radius: 30px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; margin-top: 40px; margin-bottom: 20px; }
+.btn-giant-yellow:active { transform: scale(0.96); }
+
+.cream-input { background: var(--c-cream); border: none; width: 100%; padding: 16px 22px; border-radius: 20px; font-size: 18px; font-weight: 700; color: var(--c-black); outline: none; }
+.cream-input::placeholder { color: #A09E95; font-weight: 600; }
+#entreno-form .step-label { font-size: 14px; font-weight: 800; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 15px; padding-left: 5px; }
+#exercise-counter { float: right; color: rgba(255,255,255,0.4); }
+.color-picker { display: flex; gap: 15px; }
+.color-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
+.color-circle.active { border-color: var(--c-white); transform: scale(1.1); }
+
+/* --- PASTILLAS --- */
+#exercise-pills-container { display: flex; flex-wrap: wrap; gap: 12px; }
+.exercise-pill { background: var(--c-white); color: var(--c-black); padding: 12px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; display: flex; align-items: center; transition: all 0.2s ease; cursor: pointer; }
+.exercise-pill.dotted { background: transparent; border: 2px dashed rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
+.exercise-pill.delete-mode { background: var(--bg-yellow); color: var(--c-black); animation: shake 0.4s ease-in-out; }
+.btn-delete-pill { display: none; margin-left: 10px; background: transparent; border: none; font-size: 18px; font-weight: 900; color: var(--c-black); cursor: pointer; }
+.exercise-pill.delete-mode .btn-delete-pill { display: inline-block; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px) rotate(-3deg); } 75% { transform: translateX(3px) rotate(3deg); } }
+
+/* --- BOTTOM SHEET --- */
+#bottom-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: flex-end; }
+#sheet-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+#sheet-content { background: var(--c-white); width: 100%; height: 85vh; border-top-left-radius: 30px; border-top-right-radius: 30px; position: relative; z-index: 1001; padding: 15px 25px; animation: sheetUp 0.3s ease-out forwards; display: flex; flex-direction: column; }
+.sheet-drag-bar { width: 50px; height: 5px; background: rgba(0,0,0,0.1); border-radius: 10px; margin: 0 auto 20px auto; }
+.sheet-title { font-size: 24px; font-weight: 900; letter-spacing: -1px; margin-bottom: 15px; }
+.search-input { background: #F4F4F4; border: none; width: 100%; padding: 12px 18px; border-radius: 15px; font-size: 16px; font-weight: 600; color: var(--c-black); outline: none; margin-bottom: 15px; }
+.search-input::placeholder { color: #A0A0A0; }
+#catalog-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 5px; padding-bottom: 50px;}
+.cat-header { font-size: 13px; font-weight: 800; color: #9A9A9A; text-transform: uppercase; margin: 15px 0 5px 0; transition: 0.2s;}
+.cat-item { font-size: 16px; font-weight: 600; padding: 15px 0; border-bottom: 1px solid #F0F0F0; cursor: pointer; transition: 0.2s; }
+
+/* Animaciones */
+.system-bubble, .chat-day, .chat-bubble, .form-step { opacity: 0; animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes bounceIn { 0% { transform: scale(0.6) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.fade-out-form { animation: fadeOutForm 0.3s ease forwards !important; }
+@keyframes fadeOutForm { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(15px); } }
+
+.hidden { display: none !important; }
+.mt-auto { margin-top: auto !important; }
+
+/* Arreglo Flex General */
+#entreno-state-1 { display: flex; flex-direction: column; flex: 1; }
+/* --- ANIMACIONES EN CASCADA --- */
+.btn-routine-cascade {
+    background: var(--c-white); color: var(--c-black);
+    padding: 20px; border-radius: 20px; font-size: 18px; font-weight: 800;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center;
+    cursor: pointer; opacity: 0; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.btn-routine-cascade:active { transform: scale(0.95); }
+@keyframes popIn { 0% { opacity: 0; transform: translateY(20px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* --- EL TELÓN TINDER (FRANJA AMARILLA) --- */
+#nav-bg.expanded-swipe {
+    height: calc(100vh - 60px); /* Deja 60px de franja amarilla arriba */
+    background-color: var(--bg-yellow); /* El fondo del telón se vuelve amarillo para engañar a la vista */
+    overflow: hidden;
+}
+
+.swipe-header {
+    display: flex; align-items: center; padding: 15px 20px;
+    background-color: var(--bg-yellow);
+}
+.btn-back-swipe { background: none; border: none; font-size: 28px; font-weight: 900; color: var(--c-black); margin-right: 15px; cursor: pointer; }
+.swipe-title { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; color: var(--c-black); }
+
+/* --- CARTAS --- */
+.card-stack-container {
+    flex: 1; position: relative; width: 100%; 
+    background-color: var(--c-black); border-radius: 35px 35px 0 0;
+    padding: 10px; /* Reducimos el padding para que la carta pueda ser más ancha */
+    display: flex; justify-content: center; align-items: center;
+}
+.tinder-card {
+    /* La carta ahora ocupa casi todo el ancho y el alto */
+    position: absolute; width: calc(100% - 20px); height: calc(100% - 20px); max-height: none;
+    background: var(--c-white); border-radius: 25px; padding: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    display: flex; flex-direction: column;
+    transform-origin: bottom center; will-change: transform;
+    overflow: hidden; 
+    touch-action: pan-y; 
+}
+.card-header h3 { font-size: 20px; font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 15px; color: var(--c-black); text-align: center; }
+
+/* Foto cuadrada perfecta y centrada */
+.card-photo-placeholder {
+    background: #F4F4F4; border-radius: 15px; 
+    width: 160px; height: 160px; /* Obligamos a que sea un cuadrado perfecto */
+    margin: 0 auto 15px auto; /* Lo centramos horizontalmente */
+    flex-shrink: 0; 
+    display: flex; align-items: center; justify-content: center; 
+    overflow: hidden;
+}
+.card-photo-placeholder svg { width: 40px; height: 40px; }
+
+.card-inputs { 
+    flex: 1; overflow-y: auto; overflow-x: hidden; 
+    display: flex; flex-direction: column; gap: 8px; padding-bottom: 5px;
+}
+.series-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+
+.series-label { font-size: 13px; font-weight: 800; color: #A09E95; width: 55px; flex-shrink: 0;}
+
+/* Nuevos estilos para los inputs con sufijo "Kg" y "reps" */
+.input-with-suffix {
+    position: relative; flex: 1; display: flex; align-items: center;
+}
+.series-input {
+    width: 100%; background: var(--c-cream); border: none; 
+    padding: 12px 35px 12px 10px; /* Más padding a la derecha para dejar hueco al texto gris */
+    border-radius: 12px; font-size: 16px; font-weight: 800; color: var(--c-black); 
+    outline: none; text-align: center; min-width: 0;
+}
+.input-suffix {
+    position: absolute; right: 12px; font-size: 13px; font-weight: 800; 
+    color: #A09E95; pointer-events: none; /* Para que los clicks lo atraviesen */
+}
+
+/* Iconos de Swipe */
+.swipe-icon {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 900; border: 4px solid #A09E95; color: #A09E95;
+    z-index: 100; background: var(--c-white);
+}
+.swipe-left-icon { right: 15px; }
+.swipe-right-icon { left: 15px; }
+
+/* --- ESTADO 2: GRID --- */
+.summary-grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.summary-card { background: var(--c-white); border-radius: 20px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+.sum-title { font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; color: var(--c-black); }
+.sum-data { font-size: 12px; font-weight: 700; color: #A09E95; }
