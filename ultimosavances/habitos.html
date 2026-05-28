@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlowApp - Hábitos</title>
+    <!-- Primero carga el CSS compartido, luego el específico de hábitos -->
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="habitos.css">
+</head>
+<body>
+    <!-- Menú Lateral -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Menú</h2>
+            <button id="close-menu">✕</button>
+        </div>
+        <ul class="nav-links">
+            <li onclick="window.location.href='index.html'">📓 Journaling</li>
+            <li class="active" onclick="window.location.href='habitos.html'">⚡ Hábitos</li>
+            <li class="disabled">💪 Entrenamientos (Próximamente)</li>
+        </ul>
+    </nav>
+    <div id="overlay" class="overlay"></div>
+
+    <div class="app-container">
+        <!-- Cabecera -->
+        <header>
+            <div class="header-top">
+                <button id="menu-btn" class="icon-btn">☰</button>
+                <div class="logo"><span class="gradient-text">Hábitos</span></div>
+            </div>
+            <!-- Selector de Vista -->
+            <div class="view-toggles">
+                <button class="toggle-btn active" id="btn-day" onclick="changeView('day')">Día</button>
+                <button class="toggle-btn" id="btn-week" onclick="changeView('week')">Semana</button>
+                <button class="toggle-btn" id="btn-month" onclick="changeView('month')">Mes</button>
+            </div>
+        </header>
+
+        <!-- Main View -->
+        <main id="main-view">
+            <div class="picker-container" id="picker-container"></div>
+            <div class="habits-list" id="habits-container"></div>
+            <button id="fab-add" class="fab-btn">+</button>
+        </main>
+
+        <!-- MODAL: Lista de Hábitos Creados -->
+        <div id="library-panel" class="modal-panel hidden">
+            <div class="modal-header">
+                <h2>Mis Hábitos</h2>
+                <button class="close-modal icon-btn" onclick="closeModals()">✕</button>
+            </div>
+            <div id="library-list" class="library-list"></div>
+            <button class="btn-primary" onclick="openCreateForm()">+ Crear un hábito</button>
+        </div>
+
+        <!-- MODAL: Formulario de Creación -->
+        <div id="form-panel" class="modal-panel hidden">
+            <div class="modal-header">
+                <h2 id="form-title">Crea un hábito</h2>
+                <button class="close-modal icon-btn" onclick="closeModals()">✕</button>
+            </div>
+            <div class="form-content">
+                <div class="preview-section">
+                    <p class="section-label">Vista previa</p>
+                    <div id="live-preview" class="habit-card preview-card">
+                        <div class="habit-info">
+                            <span class="habit-percent">0%</span>
+                            <span id="preview-name" class="habit-name">Escribe un nombre...</span>
+                        </div>
+                        <div id="preview-slots" class="habit-slots"></div>
+                    </div>
+                </div>
+
+                <div class="progressive-form">
+                    <div class="form-step active" id="step-name">
+                        <input type="text" id="habit-name" placeholder="Nombre del hábito (ej. Beber Agua)" autocomplete="off">
+                    </div>
+                    <div class="form-step" id="step-color">
+                        <p class="section-label">Color</p>
+                        <div class="color-picker" id="color-picker"></div>
+                    </div>
+                    <div class="form-step" id="step-icon">
+                        <p class="section-label">Icono</p>
+                        <div class="icon-picker" id="icon-picker"></div>
+                    </div>
+                    <div class="form-step" id="step-slots">
+                        <p class="section-label">Pasos por día</p>
+                        <input type="range" id="habit-slots" min="1" max="10" value="1" oninput="updatePreview()">
+                        <span id="slots-value" class="range-value">1 paso</span>
+                    </div>
+                    <div class="form-step" id="step-freq">
+                        <p class="section-label">Frecuencia</p>
+                        <select id="habit-freq">
+                            <option value="1">Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                        <div id="freq-details" class="hidden" style="margin-top: 10px;">
+                            <input type="number" id="freq-custom" placeholder="Veces..." min="1" max="30">
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="btn-save-habit" class="btn-primary" onclick="saveHabit()">Guardar Hábito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts y Script de Hábitos -->
+    <div id="toast-container" class="toast-container"></div>
+    <script src="habitos.js"></script>
+</body>
+</html>
