@@ -120,6 +120,46 @@ function forceStartWorkout() {
     }
 }
 
+async function continueWorkout(routineId, completedCount) {
+    state.activeWorkout = routineId;
+    const rData = state.libRoutines.find(r => r.ID_entreno === routineId);
+    
+    if(!rData) {
+        showToast("Error: Rutina no encontrada");
+        return;
+    }
+    
+    state.workoutExercises = [];
+    
+    // Cargar los ejercicios de la rutina
+    for(let i=1; i<=15; i++) {
+        const exId = rData[`Ejercicio_${String(i).padStart(2,'0')}`];
+        if(exId && typeof exId === 'string' && exId.trim() !== "") {
+            const exInfo = state.libExercises.find(e => e.ID_ejercicio === exId);
+            if(exInfo) state.workoutExercises.push(exInfo);
+        }
+    }
+    
+    // Fallback por si usan array local
+    if (state.workoutExercises.length === 0 && Array.isArray(rData.ejercicios)) {
+        rData.ejercicios.forEach(ex => {
+            const exInfo = state.libExercises.find(e => e.ID_ejercicio === (ex.ID_ejercicio || ex));
+            if (exInfo) state.workoutExercises.push(exInfo);
+        });
+    }
+    
+    // Asignamos el índice para saltarnos las cartas ya swipeadas
+    state.currentCardIndex = completedCount; 
+    
+    // Ocultamos las pantallas y mostramos el deck de Tinder
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('logs-screen').classList.add('hidden');
+    document.getElementById('deck-container').classList.remove('hidden');
+    
+    renderDeck();
+}
+
+
 function goToDayLog(dateStr) {
     state.referenceDate = new Date(dateStr); state.currentView = 'day';
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -205,6 +245,32 @@ function renderLogs() {
         const rData = state.libRoutines.find(r => r.ID_entreno === rutinaId);
         const rColor = rData ? rData.Color_rutina : "FF9500";
         
+        // --- NUEVA LÓGICA: Calcular si el entrenamiento está en proceso ---
+        let totalEx = 0;
+        if (rData) {
+            for(let i=1; i<=15; i++) { if(rData[`Ejercicio_${String(i).padStart(2,'0')}`]) totalEx++; }
+            if (totalEx === 0 && Array.isArray(rData.ejercicios)) totalEx = rData.ejercicios.length;
+        }
+
+        const isCompleted = dayLogs.length >= totalEx;
+
+        // Si NO está completado y es el día de hoy, mostramos la carta de "En proceso"
+        if (!isCompleted && getLocalISODate(state.referenceDate) === getLocalISODate(new Date())) {
+            container.innerHTML = `
+            <div class="routine-group" style="--routine-color: #${rColor}; text-align: center; padding: 40px 20px;">
+                <div style="font-size: 26px; font-weight: 800; margin-bottom: 15px; color: var(--text-primary);">${rData ? rData.Nombre_rutina : "Entrenamiento"}</div>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-secondary); font-size: 18px; font-weight: 700; margin-bottom: 30px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    En proceso... (${dayLogs.length}/${totalEx})
+                </div>
+                
+                <button class="btn-primary" onclick="continueWorkout('${rutinaId}', ${dayLogs.length})">Continuar entrenamiento</button>
+            </div>`;
+            return; // Salimos para que no renderice el historial de ejercicios completados aún
+        }
+        // --- FIN NUEVA LÓGICA ---
+
         let html = `
         <div class="routine-group" data-id="${rutinaId}" style="--routine-color: #${rColor};">
             <div class="log-header-top">
@@ -658,6 +724,12 @@ function renderDeck() {
         wrapper.innerHTML = `<div class="swipe-card active animate entrance-anim" style="justify-content:center; align-items:center; text-align:center;"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><polyline points="20 6 9 17 4 12"></polyline></svg><h2 class="card-title" style="color:var(--text-primary);">¡Entreno completado!</h2><button class="btn-primary" onclick="closeDeck()" style="margin-top:40px; width:80%;">Ver resultados</button></div>`;
         state.activeWorkout = null;
     }
+}
+
+async function finishAndSync() {
+    closeDeck();
+    showToast("Sincronizando entrenamiento...");
+    await syncData(); // Lanzamos la sincronización al spot de n8n
 }
 
 function editRoutine(routineId) {
