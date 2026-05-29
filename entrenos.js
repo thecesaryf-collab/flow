@@ -67,8 +67,35 @@ function toggleFab() {
 function checkTodayWorkout() {
     const todayStr = getLocalISODate(new Date());
     const refStr = getLocalISODate(state.referenceDate);
+
+    const todayLogs = state.logs.filter(l => l.Fecha_log_entreno === todayStr);
+    if (todayLogs.length > 0) {
+        const rutinaId = todayLogs[0].ID_entreno;
+        const rData = state.libRoutines.find(r => r.ID_entreno === rutinaId);
+        let totalEx = 0;
+        if (rData) {
+            for(let i=1; i<=15; i++) { if(rData[`Ejercicio_${String(i).padStart(2,'0')}`]) totalEx++; }
+            if (totalEx === 0 && Array.isArray(rData.ejercicios)) totalEx = rData.ejercicios.length;
+        }
+        
+        // CONTAMOS SOLO LOS QUE TIENEN DATOS
+        const completedEx = todayLogs.filter(l => l.Log_peso_serie_01 !== null || l.Log_repes_serie_01 !== null).length;
+
+        if (completedEx < totalEx) {
+            state.activeWorkout = rutinaId;
+            state.currentCardIndex = completedEx;
+        } else {
+            state.activeWorkout = null;
+        }
+    }
+
+    const fabLabel = document.querySelector('.fab-item[onclick*="forceStartWorkout"] .fab-label');
+    if (fabLabel) {
+        fabLabel.innerText = state.activeWorkout ? "Continuar entrenamiento" : "Iniciar entrenamiento";
+    }
+
     if (state.currentView === 'day') {
-        if (todayStr === refStr && !state.logs.some(l => l.Fecha_log_entreno === refStr)) {
+        if (todayStr === refStr && todayLogs.length === 0 && !state.activeWorkout) {
             showStartScreen(false);
         } else { skipToLogs(); }
     } else { skipToLogs(); }
@@ -252,7 +279,10 @@ function renderLogs() {
             if (totalEx === 0 && Array.isArray(rData.ejercicios)) totalEx = rData.ejercicios.length;
         }
 
-        const isCompleted = dayLogs.length >= totalEx;
+        // CONTAMOS SOLO LOS QUE TIENEN DATOS
+        const completedEx = dayLogs.filter(l => l.Log_peso_serie_01 !== null || l.Log_repes_serie_01 !== null).length;
+
+        const isCompleted = (completedEx >= totalEx) && (totalEx > 0);
 
         // Si NO está completado y es el día de hoy, mostramos la carta de "En proceso"
         if (!isCompleted && getLocalISODate(state.referenceDate) === getLocalISODate(new Date())) {
@@ -262,12 +292,12 @@ function renderLogs() {
                 
                 <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-secondary); font-size: 18px; font-weight: 700; margin-bottom: 30px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    En proceso... (${dayLogs.length}/${totalEx})
+                    En proceso... (${completedEx}/${totalEx})
                 </div>
                 
-                <button class="btn-primary" onclick="continueWorkout('${rutinaId}', ${dayLogs.length})">Continuar entrenamiento</button>
+                <button class="btn-primary" onclick="continueWorkout('${rutinaId}', ${completedEx})">Continuar entrenamiento</button>
             </div>`;
-            return; // Salimos para que no renderice el historial de ejercicios completados aún
+            return; 
         }
         // --- FIN NUEVA LÓGICA ---
 
@@ -645,7 +675,6 @@ async function startWorkout(routineId) {
     state.activeWorkout = routineId;
     const rData = state.libRoutines.find(r => r.ID_entreno === routineId);
     
-    // Seguro Anti-Caídas: si rData no existe, salimos
     if(!rData) {
         showToast("Error: Rutina no encontrada");
         return;
@@ -654,7 +683,7 @@ async function startWorkout(routineId) {
     state.workoutExercises = [];
     
     try {
-        fetchWithTimeout(WEBHOOK_URL, { 
+        const res = await fetchWithTimeout(WEBHOOK_URL, { 
             method: 'POST', 
             body: JSON.stringify({ 
                 action: "iniciar_entreno", 
@@ -664,7 +693,18 @@ async function startWorkout(routineId) {
                 date: getLocalISODate(state.referenceDate) 
             }) 
         });
-    } catch(e) { console.log("Post inicio error", e); }
+        
+        // CAPTURAMOS LOS DATOS DE N8N
+        const newLogs = await res.json();
+        
+        // Limpiamos si hubiera basura de hoy y metemos los nuevos registros vacíos
+        const todayStr = getLocalISODate(state.referenceDate);
+        state.logs = state.logs.filter(l => !(l.Fecha_log_entreno === todayStr && l.ID_entreno === routineId));
+        if (Array.isArray(newLogs)) {
+            state.logs.push(...newLogs);
+        }
+        
+    } catch(e) { console.log("Post inicio error", e); showToast("Error al iniciar en el servidor"); }
     
     for(let i=1; i<=15; i++) {
         const exId = rData[`Ejercicio_${String(i).padStart(2,'0')}`];
@@ -831,10 +871,20 @@ async function handleSaveSwipe(card, index) {
         if(r || k) seriesData.push({ reps: r || 0, kg: k || 0 }); 
     }
     
+    // ACTUALIZAR ESTADO LOCAL PARA QUE EL FRONTEND SEPA QUE ESTE YA NO ES NULL
+    const todayStr = getLocalISODate(state.referenceDate);
+    let currentLogs = state.logs.filter(l => l.Fecha_log_entreno === todayStr && l.ID_entreno === state.activeWorkout);
+    if(currentLogs[index]) {
+        seriesData.forEach((s, i) => {
+            currentLogs[index][`Log_repes_serie_0${i+1}`] = s.reps;
+            currentLogs[index][`Log_peso_serie_0${i+1}`] = s.kg;
+        });
+    }
+
     const payload = { 
         action: "guardar_ejercicio", 
         user: USERNAME, 
-        date: getLocalISODate(state.referenceDate), 
+        date: todayStr, 
         entreno_id: state.activeWorkout, 
         ejercicio_id: exId, 
         series: seriesData 
@@ -852,7 +902,6 @@ async function handleSaveSwipe(card, index) {
         showToast("Error de conexión. Vuelve a intentarlo.");
     }
 }
-
 function skipCardAndRequeue() { state.workoutExercises.push(state.workoutExercises.splice(state.currentCardIndex, 1)[0]); renderDeck(); }
 
 function showToast(msg) { 
