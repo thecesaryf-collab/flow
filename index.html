@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlowApp - Journaling</title>
+    <!-- Primero carga el CSS compartido, luego el específico -->
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Menú Lateral -->
+   <nav id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h2>Menú</h2>
+        <button id="close-menu" class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    <ul class="nav-links">
+        <li class="active" onclick="window.location.href='index.html'" style="display:flex; align-items:center; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Journaling
+        </li>
+        <li onclick="window.location.href='habitos.html'" style="display:flex; align-items:center; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Hábitos
+        </li>
+       <li onclick="window.location.href='entrenos.html'" style="display:flex; align-items:center; gap:10px;">
+    <svg width="18" height="18" fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve">
+        <g>
+            <g>
+                <path d="M503.749,226.95h-4.352v-38.073c0-16.017-13.032-29.047-29.048-29.047h-16.188v-16.132
+                    c0-16.018-13.03-29.049-29.048-29.049h-31.152c-16.017,0-29.048,13.031-29.048,29.049v83.252H147.087v-83.252
+                    c0-16.018-13.03-29.049-29.048-29.049H86.887c-16.017,0-29.048,13.031-29.048,29.049v16.132H41.652
+                    c-16.017,0-29.048,13.03-29.048,29.047v38.073H8.251c-4.557,0-8.251,3.693-8.251,8.251v41.596c0,4.558,3.694,8.251,8.251,8.251
+                    h4.353v38.071c0,16.017,13.031,29.047,29.048,29.047h16.187v16.134c0,16.017,13.03,29.048,29.048,29.048h31.152
+                    c16.017,0,29.048-13.031,29.048-29.048v-83.253h217.826v83.253c0,16.017,13.03,29.048,29.048,29.048h31.152
+                    c16.017,0,29.048-13.031,29.048-29.048v-16.134h16.187c16.017,0,29.048-13.03,29.048-29.047v-38.071h4.352
+                    c4.557,0,8.251-3.693,8.251-8.251v-41.596C512,230.644,508.306,226.95,503.749,226.95z M57.839,335.664H41.652
+                    c-6.918,0-12.545-5.627-12.545-12.544V188.878c0-6.917,5.628-12.544,12.545-12.544h16.187V335.664z M130.585,368.301
+                    c0,6.918-5.627,12.545-12.545,12.545H86.887c-6.918,0-12.545-5.627-12.545-12.545V143.698c0-6.918,5.627-12.546,12.545-12.546
+                    h31.152c6.918,0,12.545,5.628,12.545,12.546V368.301z M182.645,268.546h-35.557v-25.094h35.557V268.546z M312.857,268.546h-113.71
+                    v-25.094h113.71V268.546z M364.913,268.546H329.36v-25.094h35.553V268.546z M437.658,368.301c0,6.918-5.627,12.545-12.545,12.545
+                    h-31.152c-6.918,0-12.545-5.627-12.545-12.545V143.698c0-6.918,5.627-12.546,12.545-12.546h31.152
+                    c6.918,0,12.545,5.628,12.545,12.546V368.301z M482.893,323.12c0,6.917-5.628,12.544-12.545,12.544h-16.187V176.332h16.187
+                    c6.918,0,12.545,5.627,12.545,12.544V323.12z"/>
+            </g>
+        </g>
+    </svg>
+    <span>Entrenamientos</span>
+</li>
+    </ul>
+</nav>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Contenedor Principal de la App -->
+    <div class="app-container">
+        <header>
+            <button id="menu-btn" class="icon-btn">☰</button>
+            <div class="logo">
+                <span class="gradient-text">Journaling</span>
+            </div>
+        </header>
+
+        <main id="journal-screen">
+            <h1 id="greeting" class="fade-in">Hola, Cargando...</h1>
+            <div id="chat-container" class="chat-container"></div>
+        </main>
+
+        <footer id="input-area" class="input-area hidden">
+            <input type="text" id="journal-input" placeholder="Escribe aquí tu día..." autocomplete="off">
+            <button id="send-btn" class="send-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Toasts y Script -->
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+</body>
+</html>
