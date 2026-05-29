@@ -23,7 +23,7 @@ main { flex: 1; overflow-y: auto; padding: 0 20px 120px 20px; width: 100%; }
 .period-item.active { opacity: 1; transform: scale(1.05); color: var(--text-primary); }
 
 /* --- Pantalla de Inicio --- */
-.start-title { font-size: 38px; font-weight: 900; text-align: center; margin: 20px 0 30px; background: linear-gradient(135deg, #FF9500, #FF3B30); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; animation: slideUp 0.5s ease forwards; line-height: 1.1; }
+.start-title { font-size: 38px; font-weight: 900; text-align: center; margin: 20px 0 30px; background: linear-gradient(135deg, #FFCC00, #FF9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; animation: slideUp 0.5s ease forwards; line-height: 1.1; }
 .routines-buttons { display: flex; flex-direction: column; gap: 16px; width: 100%; }
 .btn-routine-start { width: 100%; text-align: left; padding: 24px; border-radius: var(--border-radius-lg); font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #ffffff 0%, #f4f4f8 100%); color: var(--text-primary); border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 10px 30px rgba(0,0,0,0.04); cursor: pointer; transition: all 0.3s; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; animation: slideUp 0.5s ease forwards; opacity: 0; }
 .btn-routine-start::before { content: ''; position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: var(--routine-color); border-radius: 8px 0 0 8px; }
@@ -56,7 +56,7 @@ main { flex: 1; overflow-y: auto; padding: 0 20px 120px 20px; width: 100%; }
 .edit-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; animation: fadeIn 0.3s ease; position: relative; z-index: 2147483647; pointer-events: auto !important; clear: both; }
 .btn-cancel { background: #f2f2f7; color: var(--text-secondary); border: none; font-weight: 700; cursor: pointer; padding: 14px 24px; border-radius: 12px; font-size: 16px; transition: transform 0.2s; position: relative; z-index: 2147483647; pointer-events: auto !important; }
 .btn-cancel:active { transform: scale(0.95); }
-.btn-save { background: linear-gradient(135deg, #FF9500, #FF3B30); color: #fff; border: none; font-weight: 700; border-radius: 12px; padding: 14px 24px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 149, 0, 0.3); transition: transform 0.2s; font-size: 16px; position: relative; z-index: 2147483647; pointer-events: auto !important; }
+.btn-save { background: linear-gradient(135deg, #FFCC00, #FF9500); color: #fff; border: none; font-weight: 700; border-radius: 12px; padding: 14px 24px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 204, 0, 0.3); transition: transform 0.2s; font-size: 16px; position: relative; z-index: 2147483647; pointer-events: auto !important; }
 .btn-save:active { transform: scale(0.95); }
 
 /* Acordeón de Ejercicios */
@@ -85,7 +85,7 @@ main { flex: 1; overflow-y: auto; padding: 0 20px 120px 20px; width: 100%; }
 .cal-header { font-size: 13px; font-weight: 900; color: var(--text-secondary); padding-bottom: 15px; }
 .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; border-radius: 14px; cursor: pointer; transition: all 0.2s; }
 .cal-day.trained { background: color-mix(in srgb, var(--routine-color) 10%, white); color: var(--text-primary); }
-.cal-day.active { background: linear-gradient(135deg, #FF9500, #FF3B30) !important; color: white !important; transform: scale(1.1); box-shadow: 0 8px 20px rgba(255,149,0,0.3); }
+.cal-day.active { background: linear-gradient(135deg, #FFCC00, #FF9500) !important; color: white !important; transform: scale(1.1); box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3); }
 .cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--routine-color); margin-top: 4px; }
 
 .add-routine-card { border: 2px dashed rgba(0,0,0,0.15); background: transparent; display: flex; justify-content: center; align-items: center; gap: 12px; color: var(--text-secondary); font-weight: 800; font-size: 18px; box-shadow: none; cursor: pointer; transition: all 0.3s; margin-top: 10px; border-left: 2px dashed rgba(0,0,0,0.15); }
@@ -101,17 +101,24 @@ main { flex: 1; overflow-y: auto; padding: 0 20px 120px 20px; width: 100%; }
 .fab-item:active { transform: scale(0.95); }
 .fab-label { background: var(--surface-color); padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); color: var(--text-primary); letter-spacing: -0.3px; }
 .fab-mini { width: 50px; height: 50px; border-radius: 25px; border: none; display: flex; justify-content: center; align-items: center; color: white; box-shadow: 0 10px 25px rgba(255, 149, 0, 0.3); }
-.fab-mini.fire { background: linear-gradient(135deg, #FF9500, #FF3B30); }
-.fab-mini.add { background: linear-gradient(135deg, #FF9500, #FF3B30); }
-.fab-main { width: 64px; height: 64px; border-radius: 32px; background: linear-gradient(135deg, #FF9500, #FF3B30); color: white; border: none; box-shadow: 0 15px 35px rgba(255, 149, 0, 0.4); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), background 0.3s; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-.fab-main.active { transform: rotate(45deg); background: #FF3B30; box-shadow: 0 10px 25px rgba(255, 59, 48, 0.3); }
+.fab-mini.fire { background: linear-gradient(135deg, #FFCC00, #FF9500); }
+.fab-mini.add { background: linear-gradient(135deg, #FFCC00, #FF9500); }
+.fab-main { width: 64px; height: 64px; border-radius: 32px; background: linear-gradient(135deg, #FFCC00, #FF9500); color: white; border: none; box-shadow: 0 15px 35px rgba(255, 204, 0, 0.4); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), background 0.3s; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+.fab-main.active { transform: rotate(45deg); background: #FF9500; box-shadow: 0 10px 25px rgba(255, 149, 0, 0.3); }
 
 /* --- Modales --- */
 .modal-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 105; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
 .modal-panel.hidden { transform: translateY(100%); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
 .form-content { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 30px; width: 100%; }
-.progressive-form { display: flex; flex-direction: column; gap: 24px; width: 100%; }
+.progressive-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 24px; 
+    width: 100%; 
+    position: relative; /* AÑADIDO */
+    z-index: 10; /* AÑADIDO: Fuerza al buscador a estar encima del botón */
+}
 .form-step { opacity: 0; transform: translateY(15px); max-height: 0; overflow: hidden; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; width: 100%; }
 .form-step.active { opacity: 1; transform: translateY(0); max-height: 1000px; overflow: visible; pointer-events: auto; }
 .section-label { font-size: 15px; font-weight: 900; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
@@ -135,8 +142,8 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 .color-circle.selected { border-color: var(--text-primary); transform: scale(1.15); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 
 /* BOTON PRINCIPAL DEGRADADO AMARILLO/NARANJA */
-.btn-primary { width: 100%; padding: 22px; border-radius: 16px; background: linear-gradient(135deg, #FF9500, #FF3B30); color: white; font-size: 19px; font-weight: 900; letter-spacing: -0.5px; border: none; margin-top: 20px; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 149, 0, 0.3); transition: all 0.2s; }
-.btn-primary:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 5px 15px rgba(255, 149, 0, 0.2); }
+.btn-primary { width: 100%; padding: 22px; border-radius: 16px; background: linear-gradient(135deg, #FFCC00, #FF9500); color: white; font-size: 19px; font-weight: 900; letter-spacing: -0.5px; border: none; margin-top: 20px; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 204, 0, 0.3); transition: all 0.2s; }
+.btn-primary:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 5px 15px rgba(255, 204, 0, 0.2); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; filter: grayscale(1); }
 
 .btn-icon { background: rgba(0,0,0,0.05); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-primary); transition: transform 0.2s; }
@@ -198,6 +205,7 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
     overflow: hidden; 
     transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
     animation: slideUp 0.4s forwards; 
+    flex-shrink: 0; /* ESTO EVITA QUE SE ACHATEN */
 }
 .library-acc-header { 
     padding: 16px 20px; 
