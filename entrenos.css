@@ -1,4 +1,4 @@
-    /* entrenos.css - DISEÑO DISRUPTIVO ULTRA PREMIUM 2026 */
+  /* entrenos.css - DISEÑO DISRUPTIVO ULTRA PREMIUM 2026 */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 * { box-sizing: border-box; font-family: 'Outfit', sans-serif !important; }
@@ -155,12 +155,12 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 #deck-container { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 1000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 #cards-wrapper { 
     position: relative; 
-    width: 90%; 
-    max-width: 350px; /* Carta más estrecha para dejar aire */
-    height: 72vh;     /* Menos altura para separar de los botones */
+    width: 92%;         /* Ganamos un poco de ancho a los lados */
+    max-width: 370px;   /* Aumentamos el límite para pantallas más grandes */
+    height: 82vh;       /* ¡AQUÍ ESTÁ LA MAGIA! Estiramos la carta hacia abajo un 5% más */
     perspective: 1000px; 
     z-index: 10; 
-    margin-top: 50px; /* Baja la carta para que no pise los botones */
+    margin-top: 50px;   /* Espacio exacto para no pisar los botones que ahora están en 15px */
 }
 
 .swipe-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface-color); border-radius: 32px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; user-select: none; touch-action: pan-y; overflow: hidden; }
@@ -174,20 +174,33 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 .swipe-card.entrance-anim::after { content: ''; position: absolute; top: 0; left: -200%; width: 150%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.15) 70%, rgba(255,255,255,0) 100%); transform: skewX(-30deg); filter: blur(10px); animation: shineSweep 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s forwards; z-index: 100; pointer-events: none; }
 
 .card-visual { 
-    height: 32%; /* Reducido del 45% */
-    min-height: 160px; /* Reducido para dar más espacio a los inputs */
-    background-size: cover; 
-    background-position: center; 
+    height: 32%; 
+    min-height: 160px; 
+    
+    /* --- NUEVA LÓGICA DEL GIF --- */
+    background-color: #ffffff;      /* Rellena todo el hueco libre de color blanco */
+    background-size: auto 100%;     /* Fuerza al GIF a ocupar exactamente el 100% del alto */
+    background-position: right center; /* Lo alinea pegado al borde derecho */
+    background-repeat: no-repeat;   /* Evita que el GIF se duplique para rellenar */
+    /* ---------------------------- */
+    
     position: relative; 
     display: flex; 
     flex-direction: column; 
     justify-content: flex-end; 
     padding: 24px 20px; 
-}
+}   
 .card-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); }
 .card-visual-text { position: relative; z-index: 2; }
 .card-progress { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 900; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 2px; }
-.card-title { font-size: 34px; font-weight: 700; color: white; line-height: 1.1; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.card-title { 
+    font-size: 25px; /* Reducido (antes 34px) para que quepa mejor y sea más fino */
+    font-weight: 700; 
+    color: white; 
+    line-height: 1.2; 
+    letter-spacing: -0.3px; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+}
 
 .series-container { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 24px; background: var(--bg-color); }
 .serie-row { display: flex; align-items: center; gap: 15px; background: var(--surface-color); padding: 14px 16px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); border: 2px solid transparent; }
@@ -257,7 +270,7 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 
 .deck-header-btns { 
     position: absolute; 
-    top: 30px; 
+    top: 15px; /* Reducido a la mitad (antes 30px) para subirlos sin pegarlos al borde del todo */
     width: 100%; 
     padding: 0 20px; 
     display: flex; 
