@@ -137,7 +137,10 @@ function openPastWorkout() {
 
 function forceStartWorkout() {
     if (state.activeWorkout) { 
-        document.getElementById('deck-container').classList.remove('hidden'); renderDeck(); 
+        // En lugar de ir a pecho descubierto a renderDeck, 
+        // pasamos por continueWorkout para que cargue los ejercicios en memoria
+        const completedCount = state.currentCardIndex || 0;
+        continueWorkout(state.activeWorkout, completedCount);
     } else {
         state.referenceDate = new Date(); state.currentView = 'day';
         document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
