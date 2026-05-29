@@ -762,7 +762,9 @@ function renderDeck() {
         
         setTimeout(() => activeCard.classList.remove('entrance-anim'), 1000);
         
-        setupDynamicSets(state.currentCardIndex); setupSwipeTouch(activeCard);
+        setupDynamicSets(state.currentCardIndex); 
+        setupVerticalSwipeForInputs(state.currentCardIndex); // <- AÑADE ESTA LÍNEA AQUÍ
+        setupSwipeTouch(activeCard);
     } else {
         wrapper.innerHTML = `<div class="swipe-card active animate entrance-anim" style="justify-content:center; align-items:center; text-align:center;"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><polyline points="20 6 9 17 4 12"></polyline></svg><h2 class="card-title" style="color:var(--text-primary);">¡Entreno completado!</h2><button class="btn-primary" onclick="closeDeck()" style="margin-top:40px; width:80%;">Ver resultados</button></div>`;
         state.activeWorkout = null;
@@ -807,11 +809,23 @@ function createCardHtml(exercise, statusClass, index) {
     
     let setsHtml = '';
     for(let i=1; i<=5; i++) {
-        setsHtml += `<div class="serie-row ${i > 1 ? 'hidden-set' : ''}" id="row-${index}-${i}"><div class="serie-num">${i}</div><div class="inputs-group"><input type="number" id="reps-${index}-${i}" class="serie-input input-reps" placeholder="Reps"><input type="number" id="kg-${index}-${i}" class="serie-input input-kg" placeholder="Kg"></div></div>`;
+        // Estructura actualizada con el .input-wrapper y el .unit-label
+        setsHtml += `
+        <div class="serie-row ${i > 1 ? 'hidden-set' : ''}" id="row-${index}-${i}">
+            <div class="serie-num">${i}</div>
+            <div class="inputs-group">
+                <div class="input-wrapper">
+                    <input type="number" id="reps-${index}-${i}" class="serie-input input-reps" placeholder="0">
+                    <span class="unit-label">reps</span>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" id="kg-${index}-${i}" class="serie-input input-kg" placeholder="0">
+                    <span class="unit-label">kg</span>
+                </div>
+            </div>
+        </div>`;
     }
     
-    // AQUÍ ESTÁ LA MAGIA: 
-    // Usamos el GIF de la base de datos. Si viene nulo o vacío, usamos la imagen por defecto.
     const bgImage = exercise.gif_url_completa || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop";
 
     card.innerHTML = `
@@ -829,41 +843,127 @@ function createCardHtml(exercise, statusClass, index) {
 function setupDynamicSets(cardIndex) {
     for(let i=1; i<=5; i++) { 
         const repsIn = document.getElementById(`reps-${cardIndex}-${i}`), kgIn = document.getElementById(`kg-${cardIndex}-${i}`), row = document.getElementById(`row-${cardIndex}-${i}`);
-        const makeActive = () => { document.querySelectorAll('.serie-row').forEach(r => r.classList.remove('active-input')); if(row) row.classList.add('active-input'); };
-        if(repsIn) repsIn.addEventListener('focus', makeActive); if(kgIn) kgIn.addEventListener('focus', makeActive);
+        
+        const makeActive = () => { 
+            document.querySelectorAll('.serie-row').forEach(r => r.classList.remove('active-input')); 
+            if(row) row.classList.add('active-input'); 
+        };
+        
+        if(repsIn) repsIn.addEventListener('focus', makeActive); 
+        if(kgIn) kgIn.addEventListener('focus', makeActive);
         
         const checkNext = () => {
             if(i < 5 && repsIn.value !== "" && kgIn.value !== "") {
                 const nextRow = document.getElementById(`row-${cardIndex}-${i+1}`);
-                if(nextRow && nextRow.classList.contains('hidden-set')) { nextRow.classList.remove('hidden-set'); }
+                if(nextRow && nextRow.classList.contains('hidden-set')) { 
+                    nextRow.classList.remove('hidden-set');
+                    nextRow.classList.add('show-anim'); // Lanzamos la animación de escala y fade
+                }
             }
         };
-        if(repsIn) repsIn.addEventListener('input', checkNext); if(kgIn) kgIn.addEventListener('input', checkNext);
+        
+        if(repsIn) repsIn.addEventListener('input', checkNext); 
+        if(kgIn) kgIn.addEventListener('input', checkNext);
     }
 }
 
 let startX = 0, currentX = 0, isDragging = false;
 function setupSwipeTouch(card) {
     const rightEdge = document.getElementById('edge-right'), leftEdge = document.getElementById('edge-left'), threshold = window.innerWidth * 0.15; 
-    card.addEventListener('touchstart', (e) => { if(e.target.tagName.toLowerCase() === 'input') return; startX = e.touches[0].clientX; isDragging = true; card.classList.remove('animate'); });
-    card.addEventListener('touchmove', (e) => {
-        if(!isDragging) return; currentX = e.touches[0].clientX - startX;
-        card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
-        if(currentX > 0) { let pct = Math.min(currentX / threshold, 1); rightEdge.style.transform = `translateX(-${pct * 100}px)`; rightEdge.style.opacity = pct; leftEdge.style.opacity = 0; } 
-        else { let pct = Math.min(Math.abs(currentX) / threshold, 1); leftEdge.style.transform = `translateX(${pct * 100}px)`; leftEdge.style.opacity = pct; rightEdge.style.opacity = 0; }
+    card.addEventListener('touchstart', (e) => { 
+        // NUEVO: Ignora el swipe de la carta si tocamos en CUALQUIER parte de la zona de inputs
+        if(e.target.closest('.inputs-group')) return; 
+        
+        startX = e.touches[0].clientX; 
+        isDragging = true; 
+        card.classList.remove('animate'); 
     });
+    
+    card.addEventListener('touchmove', (e) => {
+        if(!isDragging) return; 
+        currentX = e.touches[0].clientX - startX;
+        card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+        
+        if(currentX > 0) { 
+            let pct = Math.min(currentX / threshold, 1); 
+            rightEdge.style.transform = `translateX(-${pct * 100}px)`; 
+            rightEdge.style.opacity = pct; 
+            leftEdge.style.opacity = 0; 
+        } else { 
+            let pct = Math.min(Math.abs(currentX) / threshold, 1); 
+            leftEdge.style.transform = `translateX(${pct * 100}px)`; 
+            leftEdge.style.opacity = pct; 
+            rightEdge.style.opacity = 0; 
+        }
+    });
+    
     card.addEventListener('touchend', () => {
-        if(!isDragging) return; isDragging = false; card.classList.add('animate');
+        if(!isDragging) return; 
+        isDragging = false; 
+        card.classList.add('animate');
+        
         if (currentX > threshold) { 
             card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`; 
             handleSaveSwipe(card, state.currentCardIndex);
-        } 
-        else if (currentX < -threshold) { 
-            card.style.transform = `translateX(-${window.innerWidth * 1.5}px) rotate(-30deg)`; setTimeout(() => skipCardAndRequeue(), 300); 
-        } 
-        else { card.style.transform = `translateX(0px) rotate(0deg)`; rightEdge.style.opacity = 0; leftEdge.style.opacity = 0; }
+        } else if (currentX < -threshold) { 
+            card.style.transform = `translateX(-${window.innerWidth * 1.5}px) rotate(-30deg)`; 
+            setTimeout(() => skipCardAndRequeue(), 300); 
+        } else { 
+            card.style.transform = `translateX(0px) rotate(0deg)`; 
+            rightEdge.style.opacity = 0; 
+            leftEdge.style.opacity = 0; 
+        }
         currentX = 0;
     });
+}
+
+
+function setupVerticalSwipeForInputs(cardIndex) {
+    for(let i=1; i<=5; i++) {
+        ['reps', 'kg'].forEach(type => {
+            const inp = document.getElementById(`${type}-${cardIndex}-${i}`);
+            if(!inp) return;
+            
+            let startY = 0;
+            let startVal = 0;
+            let isDraggingNum = false;
+
+            inp.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startVal = parseFloat(inp.value) || 0;
+                isDraggingNum = false;
+            }, { passive: true });
+
+            inp.addEventListener('touchmove', (e) => {
+                const currentY = e.touches[0].clientY;
+                const deltaY = startY - currentY; // Positivo al deslizar hacia arriba
+
+                // Si el movimiento vertical supera 10px, asumimos que quiere cambiar el número
+                if (Math.abs(deltaY) > 10) {
+                    isDraggingNum = true;
+                    if(e.cancelable) e.preventDefault(); // Evita el scroll nativo de la pantalla
+                    inp.blur(); // Quita el foco para que se esconda el teclado numérico
+                    
+                    // Modificador de velocidad: 1 unidad cada 8 píxeles de recorrido
+                    let increment = Math.floor(deltaY / 8); 
+                    let newVal = startVal + increment;
+                    
+                    if(newVal < 0) newVal = 0; // Previene números negativos
+                    if(newVal > 999) newVal = 999; // Límite lógico
+                    
+                    inp.value = newVal;
+                    inp.dispatchEvent(new Event('input')); // Dispara el evento para que se desvele la siguiente fila si procede
+                }
+            }, { passive: false }); // Debe ser false para permitir preventDefault
+
+            inp.addEventListener('touchend', (e) => {
+                // Si estaba arrastrando, evitamos el evento por defecto (que reabriría el teclado)
+                if(isDraggingNum && e.cancelable) {
+                    e.preventDefault(); 
+                }
+            });
+        });
+    }
 }
 
 async function handleSaveSwipe(card, index) {
@@ -915,3 +1015,5 @@ function showToast(msg) {
 const menuBtn = document.getElementById('menu-btn'), closeMenuBtn = document.getElementById('close-menu'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay');
 const closeMenu = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
 menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('show'); }); closeMenuBtn.addEventListener('click', closeMenu); overlay.addEventListener('click', closeMenu);
+
+
