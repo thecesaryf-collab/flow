@@ -974,7 +974,7 @@ async function handleSaveSwipe(card, index) {
         if(r || k) seriesData.push({ reps: r || 0, kg: k || 0 }); 
     }
     
-    // ACTUALIZAR ESTADO LOCAL PARA QUE EL FRONTEND SEPA QUE ESTE YA NO ES NULL
+    // ACTUALIZAR ESTADO LOCAL PARA QUE EL FRONTEND SEPA QUE ESTE YA NO ES NULL.
     const todayStr = getLocalISODate(state.referenceDate);
     let currentLogs = state.logs.filter(l => l.Fecha_log_entreno === todayStr && l.ID_entreno === state.activeWorkout);
     if(currentLogs[index]) {
