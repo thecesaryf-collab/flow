@@ -870,12 +870,13 @@ function setupDynamicSets(cardIndex) {
 let startX = 0, currentX = 0, isDragging = false;
 function setupSwipeTouch(card) {
     const rightEdge = document.getElementById('edge-right'), leftEdge = document.getElementById('edge-left'), threshold = window.innerWidth * 0.15; 
+    
     card.addEventListener('touchstart', (e) => { 
-        // NUEVO: Ignora el swipe de la carta si tocamos en CUALQUIER parte de la zona de inputs
         if(e.target.closest('.inputs-group')) return; 
         
         startX = e.touches[0].clientX; 
         isDragging = true; 
+        card.style.transition = 'none'; 
         card.classList.remove('animate'); 
     });
     
@@ -886,29 +887,57 @@ function setupSwipeTouch(card) {
         
         if(currentX > 0) { 
             let pct = Math.min(currentX / threshold, 1); 
-            rightEdge.style.transform = `translateX(-${pct * 100}px)`; 
-            rightEdge.style.opacity = pct; 
-            leftEdge.style.opacity = 0; 
+            rightEdge.style.transform = `translateX(-${pct * 100}px)`; rightEdge.style.opacity = pct; leftEdge.style.opacity = 0; 
         } else { 
             let pct = Math.min(Math.abs(currentX) / threshold, 1); 
-            leftEdge.style.transform = `translateX(${pct * 100}px)`; 
-            leftEdge.style.opacity = pct; 
-            rightEdge.style.opacity = 0; 
+            leftEdge.style.transform = `translateX(${pct * 100}px)`; leftEdge.style.opacity = pct; rightEdge.style.opacity = 0; 
         }
     });
     
     card.addEventListener('touchend', () => {
         if(!isDragging) return; 
         isDragging = false; 
-        card.classList.add('animate');
         
         if (currentX > threshold) { 
-            card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`; 
-            handleSaveSwipe(card, state.currentCardIndex);
+            // --- NUEVO: Comprobamos si hay al menos una serie rellena ---
+            let hasValidSet = false;
+            for(let i=1; i<=5; i++){
+                const r = document.getElementById(`reps-${state.currentCardIndex}-${i}`)?.value;
+                const k = document.getElementById(`kg-${state.currentCardIndex}-${i}`)?.value;
+                if(r || k) { // Si hay algo escrito en reps o kg, es válido
+                    hasValidSet = true;
+                    break;
+                }
+            }
+
+            if (hasValidSet) {
+                // Swipe Derecho Válido (Guardar) - Brillo Verde y salida rápida
+                card.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.05), box-shadow 0.3s ease, opacity 0.4s ease';
+                card.style.boxShadow = '0 0 60px rgba(52, 199, 89, 0.8)'; 
+                card.style.transform = `translateX(${window.innerWidth * 1.2}px) translateY(-50px) rotate(25deg) scale(1.05)`; 
+                card.style.opacity = '0';
+                
+                handleSaveSwipe(card, state.currentCardIndex);
+            } else {
+                // Swipe Derecho Inválido (Vacío) - Rebote al centro y aviso
+                card.style.transition = 'transform 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
+                card.style.transform = `translateX(0px) rotate(0deg)`; 
+                rightEdge.style.opacity = 0; 
+                leftEdge.style.opacity = 0; 
+                showToast("Añade al menos una serie para guardar");
+            }
+
         } else if (currentX < -threshold) { 
-            card.style.transform = `translateX(-${window.innerWidth * 1.5}px) rotate(-30deg)`; 
-            setTimeout(() => skipCardAndRequeue(), 300); 
+            // Swipe Izquierdo (Saltar) - Brillo Rojo y salida rápida (Este sí se permite vacío)
+            card.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.05), box-shadow 0.3s ease, opacity 0.4s ease';
+            card.style.boxShadow = '0 0 60px rgba(255, 59, 48, 0.8)'; 
+            card.style.transform = `translateX(-${window.innerWidth * 1.2}px) translateY(-50px) rotate(-25deg) scale(1.05)`; 
+            card.style.opacity = '0';
+            
+            setTimeout(() => skipCardAndRequeue(), 400); 
         } else { 
+            // Vuelve al centro suavemente si no se pasa el umbral de arrastre
+            card.style.transition = 'transform 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
             card.style.transform = `translateX(0px) rotate(0deg)`; 
             rightEdge.style.opacity = 0; 
             leftEdge.style.opacity = 0; 
@@ -974,7 +1003,7 @@ async function handleSaveSwipe(card, index) {
         if(r || k) seriesData.push({ reps: r || 0, kg: k || 0 }); 
     }
     
-    // ACTUALIZAR ESTADO LOCAL PARA QUE EL FRONTEND SEPA QUE ESTE YA NO ES NULL.
+    // Guardado en estado local
     const todayStr = getLocalISODate(state.referenceDate);
     let currentLogs = state.logs.filter(l => l.Fecha_log_entreno === todayStr && l.ID_entreno === state.activeWorkout);
     if(currentLogs[index]) {
@@ -993,16 +1022,15 @@ async function handleSaveSwipe(card, index) {
         series: seriesData 
     };
     
+    // UI Optimista: Pasamos a la siguiente carta sin esperar al servidor
+    // Esto hace que la app se sienta un 1000% más rápida
+    setTimeout(() => { state.currentCardIndex++; renderDeck(); }, 400);
+
     try {
-        card.style.opacity = "0.6"; 
         const res = await fetchWithTimeout(WEBHOOK_URL, { method: 'POST', body: JSON.stringify(payload) });
         if(!res.ok) throw new Error();
-        card.style.transform = `translateX(${window.innerWidth * 1.5}px) rotate(30deg)`; card.style.opacity = "1";
-        setTimeout(() => { state.currentCardIndex++; renderDeck(); }, 250);
     } catch(e) {
-        card.style.opacity = "1"; card.style.transform = `translateX(0px) rotate(0deg)`;
-        document.getElementById('edge-right').style.opacity = 0;
-        showToast("Error de conexión. Vuelve a intentarlo.");
+        showToast("Error de conexión al guardar el ejercicio. Se actualizará en segundo plano.");
     }
 }
 function skipCardAndRequeue() { state.workoutExercises.push(state.workoutExercises.splice(state.currentCardIndex, 1)[0]); renderDeck(); }
@@ -1015,5 +1043,7 @@ function showToast(msg) {
 const menuBtn = document.getElementById('menu-btn'), closeMenuBtn = document.getElementById('close-menu'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay');
 const closeMenu = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
 menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('show'); }); closeMenuBtn.addEventListener('click', closeMenu); overlay.addEventListener('click', closeMenu);
+
+
 
 
