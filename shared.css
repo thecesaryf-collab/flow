@@ -178,3 +178,97 @@ header {
 @keyframes slideInDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes popIn { 0% { opacity: 0; transform: translateY(15px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+/* ==========================================================================
+   COMPORTAMIENTO NATIVO GLOBAL (ANTI-WEB)
+   ========================================================================== */
+
+/* 1. Eliminar el recuadro azul/gris táctil en TODA la app (Forzado) */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 2. Prevenir selección de texto y zoom accidental en elementos interactivos */
+button, 
+a, 
+input[type="range"], 
+.toggle-btn, 
+.icon-btn, 
+.nav-links li,
+.day-item, 
+.period-item, 
+.habit-card, 
+.week-day-card, 
+.library-habit-card,
+.fab-btn, 
+.fab-main, 
+.fab-mini, 
+.cal-day, 
+.add-routine-card, 
+.add-habit-card, 
+.btn-primary, 
+.send-btn,
+.deck-btn {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    outline: none !important;
+    
+    /* Elimina el retraso de 300ms al tocar la pantalla (Vital para apps web) */
+    touch-action: manipulation !important; 
+}
+/* ==========================================================================
+   FEEDBACK VISUAL NATIVO (EFECTO DE PULSACIÓN iOS)
+   ========================================================================== */
+
+/* 1. Aseguramos que el cambio de color sea fluido pero rápido (Premium feel) */
+button, 
+a, 
+.toggle-btn, 
+.icon-btn, 
+.nav-links li,
+.day-item, 
+.habit-card, 
+.week-day-card, 
+.library-habit-card,
+.fab-btn, 
+.fab-main, 
+.fab-mini, 
+.cal-day, 
+.add-routine-card, 
+.add-habit-card, 
+.btn-primary, 
+.send-btn,
+.deck-btn {
+    /* Mantenemos tus curvas de animación pero aseguramos que filter y opacity también se animen */
+    transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1), 
+                filter 0.15s ease-out, 
+                opacity 0.15s ease-out, 
+                box-shadow 0.25s ease !important;
+}
+
+/* 2. Oscurecimiento dinámico al mantener pulsado (Magia de iOS) */
+button:active:not(:disabled), 
+a:active, 
+.toggle-btn:active, 
+.icon-btn:active, 
+.nav-links li:active,
+.day-item:active,
+.habit-card:active,
+.week-day-card:active,
+.library-habit-card:active,
+.fab-btn:active,
+.fab-main:active,
+.fab-mini:active,
+.cal-day:active,
+.add-routine-card:active,
+.add-habit-card:active,
+.btn-primary:active:not(:disabled),
+.send-btn:active:not(:disabled),
+.deck-btn:active {
+    /* Oscurece un 15% y satura ligeramente los colores para dar peso a la pulsación */
+    filter: brightness(0.85) saturate(1.1) !important;
+    
+    /* Lo hace un 10% translúcido para integrarse con la sombra/fondo */
+    opacity: 0.9 !important;
+}
