@@ -1,6 +1,6 @@
 // Configuración
 const WEBHOOK_URL = 'https://automations-n8n.b8vwcm.easypanel.host/webhook/FLOW_mini';
-const USERNAME = 'César'; // Idealmente, vendría de un login
+const USERNAME = 'cesaryf'; // ¡Corregido! Ahora coincide con entrenos.js y habitos.js
 const DAYS_ES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 // Elementos del DOM
@@ -95,24 +95,23 @@ async function fetchJournalingSync() {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "Sincron Journaling", user: "cesaryf" })
+            body: JSON.stringify({ action: "Sincron Journaling", user: USERNAME }) // Usando variable
         });
         
         if (!response.ok) throw new Error('Error en sincronización');
         
         const data = await response.json();
-        // Asumiendo que n8n devuelve el array tal como lo pasaste en el prompt
         return data[0]; 
     } catch (error) {
         console.error("Error fetching n8n:", error);
         showToast("Error conectando con el servidor. Usando datos locales para prueba.");
-        // Fallback local por si tienes problemas de CORS mientras programas
+        // Fallback local dinámico con la variable
         return {
-            "ID_log_jour": "log20260527_cesaryf_jour001",
-            "Usuario": "cesaryf",
+            "ID_log_jour": `log20260527_${USERNAME}_jour001`,
+            "Usuario": USERNAME,
             "Log_jour_dia_01": "Hoy completé todo el entreno de pecho con buenas sensaciones.",
             "Log_jour_dia_02": "Me costó arrancar por la mañana pero avancé bastante trabajo.",
-            "Log_jour_dia_03": "", // Vacío para forzar Estado 1 si hoy es Miércoles
+            "Log_jour_dia_03": "", 
             "Log_jour_dia_04": "",
             "Log_jour_dia_05": "",
             "Log_jour_dia_06": "",
@@ -132,19 +131,17 @@ async function sendNewJournaling(text) {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "Nuevo Journaling", user: "cesaryf", text: text, dayKey: getCurrentDayKey() }),
+            body: JSON.stringify({ action: "Nuevo Journaling", user: USERNAME, text: text, dayKey: getCurrentDayKey() }), // Usando variable
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
         if (response.ok) {
-            // 200 OK -> Pasamos a pintar el mensaje y cambiar a Estado 2
             dom.journalInput.value = '';
             dom.inputArea.classList.add('hidden');
             addMessageToChat(text, 'user', 100);
             
-            // Simular recarga de datos para entrar en Estado 2 completo tras 2 segundos
             setTimeout(() => initApp(), 2000); 
         } else {
             throw new Error('El servidor no respondió con éxito.');
@@ -172,10 +169,8 @@ async function initApp() {
 
     // Lógica de Cambio de Estado
     if (!logs[todayKey] || logs[todayKey].trim() === "") {
-        // Hueco del día vacío -> Estado 1
         renderState1();
     } else {
-        // Hueco del día lleno -> Estado 2
         renderState2(logs);
     }
 }
