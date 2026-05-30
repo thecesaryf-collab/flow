@@ -205,3 +205,11 @@ dom.overlay.addEventListener('click', closeMenu);
 
 // Iniciar aplicación
 document.addEventListener('DOMContentLoaded', initApp);
+
+// --- FUNCIÓN CERRAR SESIÓN ---
+function cerrarSesion() {
+    // 1. Borramos el usuario guardado
+    localStorage.removeItem('flow_mini_user');
+    // 2. Redirigimos al login
+    window.location.replace('logchapuzaprovisional.html');
+}
