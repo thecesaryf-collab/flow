@@ -104,21 +104,30 @@ async function syncData() {
             body: JSON.stringify({ action: "syncro_habitos", user: USERNAME }) 
         });
         const rawData = await response.json(); 
-        const payload = rawData[0] || {}; // Misma protección por si acaso
+        const payload = rawData[0] || {};
+
+        // --- SOLUCIÓN: Filtrar los hábitos y logs que no tengan las propiedades esenciales ---
         
-        if (payload.lib_habitos && payload.lib_habitos.length > 0) {
-            state.library = Array.from(new Map(payload.lib_habitos.map(item => [item.ID_habito, item])).values());
+        // 1. Filtrar librería: Solo aceptamos los que tengan ID_habito y Nombre_habito
+        if (payload.lib_habitos && Array.isArray(payload.lib_habitos)) {
+            state.library = payload.lib_habitos.filter(item => item.ID_habito && item.Nombre_habito);
+            // Si quieres eliminar duplicados (opcional):
+            state.library = Array.from(new Map(state.library.map(item => [item.ID_habito, item])).values());
         } else {
             state.library = [];
         }
-        state.logs = payload.logs_habitos || []; 
+
+        // 2. Filtrar logs: Solo aceptamos los que tengan ID_habito
+        if (payload.logs_habitos && Array.isArray(payload.logs_habitos)) {
+            state.logs = payload.logs_habitos.filter(log => log.ID_habito);
+        } else {
+            state.logs = [];
+        }
         
-        // 1. Dibuja siempre el fondo y la interfaz vacía para que no quede en blanco
         renderHabits(); 
         
-        // 2. Si no hay hábitos, lanza el formulario por encima (tu "interfaz especial")
         if (state.library.length === 0) {
-            openCreateForm();
+            openLibrary();
         }
     } catch (e) { showToast("Error de conexión al sincronizar."); }
 }
@@ -744,8 +753,6 @@ function simulatePreviewSlot() {
     void card.offsetWidth; // Reflow para reiniciar la animación
     card.classList.add('success-pop');
 }
-
-
 // --- FUNCIÓN CERRAR SESIÓN ---
 function cerrarSesion() {
     // 1. Borramos el usuario guardado
