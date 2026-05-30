@@ -45,6 +45,7 @@ function getMonday(d) { d = new Date(d); const day = d.getDay(), diff = d.getDat
 document.addEventListener('DOMContentLoaded', async () => { 
     setupUIEvents(); 
     renderPicker(); 
+    setupDeleteSwitch();
     await syncData(); 
     document.addEventListener('click', (e) => {
         if(!e.target.closest('.log-actions-menu-container')) {
@@ -918,7 +919,6 @@ async function startWorkout(routineId) {
 function closeDeck() { document.getElementById('deck-container').classList.add('hidden'); checkTodayWorkout(); }
 
 async function resetWorkout() {
-    if(!confirm("¿Deseas eliminar/resetear el entreno de hoy?")) return;
     try {
         showToast("Eliminando...");
         const res = await fetchWithTimeout(WEBHOOK_URL, { 
@@ -1332,4 +1332,155 @@ async function deleteRoutine(routineId, event) {
         }
         showToast("Error de conexión. Se ha cancelado el borrado.");
     }
+}
+
+// NUEVA FUNCIÓN: Lógica del botón X -> Slide to Delete
+function setupDeleteSwitch() {
+    let preSwitchTimer;
+    let holdTimer;
+    let isPreSwitch = false; // Estado a los 0.4s
+    let isSwitchMode = false; // Estado al 1.0s
+    let switchStartX = 0;
+    let thumbPos = 0;
+    let hasStartedDrag = false;
+
+    const mainBtn = document.getElementById('deck-main-btn');
+    const track = document.getElementById('delete-switch-track');
+    const wrapper = document.getElementById('delete-switch-wrapper');
+    const iconX = mainBtn.querySelector('.icon-x');
+    const iconTrash = mainBtn.querySelector('.icon-trash');
+    const deckContainer = document.getElementById('deck-container'); 
+
+    if(!mainBtn) return;
+
+    mainBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function resetSwitch() {
+        clearTimeout(preSwitchTimer);
+        clearTimeout(holdTimer);
+        isPreSwitch = false;
+        isSwitchMode = false;
+        hasStartedDrag = false;
+        thumbPos = 0;
+        
+        // Quitamos ambas fases
+        wrapper.classList.remove('pre-switch', 'active-switch');
+        
+        mainBtn.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        mainBtn.style.transform = `translateX(0px)`;
+        iconX.style.opacity = 1;
+        iconTrash.style.opacity = 0;
+        iconTrash.style.color = '#000'; 
+        
+        if(deckContainer) {
+            deckContainer.style.transition = 'background-color 0.4s ease';
+            deckContainer.style.backgroundColor = ''; 
+        }
+    }
+
+    mainBtn.addEventListener('touchstart', (e) => {
+        if (isPreSwitch || isSwitchMode) return;
+        switchStartX = e.touches[0].clientX;
+        
+        // FASE 1: A los 0.4s sale el Pop y la Papelera
+        preSwitchTimer = setTimeout(() => {
+            isPreSwitch = true;
+            wrapper.classList.add('pre-switch');
+            iconX.style.opacity = 0;
+            iconTrash.style.opacity = 1;
+            
+            // Micro-vibración para confirmar que "ha enganchado"
+            if(navigator.vibrate) navigator.vibrate(15); 
+        }, 400);
+
+        // FASE 2: Al 1.0s sale la pastilla entera
+        holdTimer = setTimeout(() => {
+            isSwitchMode = true;
+            wrapper.classList.add('active-switch');
+            
+            // Segunda vibración indicando que ya puedes deslizar
+            if(navigator.vibrate) navigator.vibrate(40); 
+        }, 1000); 
+    }, { passive: true });
+
+    mainBtn.addEventListener('touchmove', (e) => {
+        if (!isSwitchMode) {
+            // Si el usuario mueve el dedo antes de que salga la pastilla (1.0s), cancelamos todo
+            if (Math.abs(e.touches[0].clientX - switchStartX) > 10) {
+                resetSwitch(); 
+            }
+            return;
+        }
+        
+        e.preventDefault(); 
+        
+        if (!hasStartedDrag) {
+            switchStartX = e.touches[0].clientX;
+            hasStartedDrag = true;
+        }
+        
+        let currentX = e.touches[0].clientX;
+        let deltaX = currentX - switchStartX; 
+        
+        const maxSlide = track.offsetWidth - mainBtn.offsetWidth;
+
+        if (deltaX > 0) deltaX = 0; 
+        if (deltaX < -maxSlide) deltaX = -maxSlide; 
+
+        thumbPos = deltaX;
+        mainBtn.style.transition = 'none';
+        mainBtn.style.transform = `translateX(${deltaX}px)`;
+
+        const progress = Math.abs(deltaX) / maxSlide;
+        
+        const r = Math.floor(progress * 255);
+        const g = Math.floor(progress * 59);
+        const b = Math.floor(progress * 48);
+        iconTrash.style.color = `rgb(${r}, ${g}, ${b})`;
+
+        if (deckContainer) {
+            deckContainer.style.transition = 'none'; 
+            const bgRed = Math.floor(progress * 180);
+            deckContainer.style.backgroundColor = `rgba(${bgRed}, 0, 0, 0.85)`;
+        }
+
+    }, { passive: false });
+
+    const handleEnd = (e) => {
+        clearTimeout(preSwitchTimer);
+        clearTimeout(holdTimer);
+        
+        if (!isSwitchMode) {
+            // Si soltó ANTES de los 0.4s (un tap rápido normal) -> Cerramos el Deck
+            if (!isPreSwitch && !hasStartedDrag) {
+                closeDeck(); 
+            } else {
+                // Si soltó entre los 0.4s y 1.0s (salió el Pop pero se arrepintió) -> Solo revertimos visuales
+                resetSwitch();
+            }
+        } else {
+            // Si la pastilla ya había salido, evaluamos si llegó al final
+            const maxSlide = track.offsetWidth - mainBtn.offsetWidth;
+            
+            if (Math.abs(thumbPos) >= maxSlide * 0.95) {
+                resetWorkout(); 
+                setTimeout(resetSwitch, 500);
+            } else {
+                mainBtn.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                mainBtn.style.transform = `translateX(0px)`;
+                iconTrash.style.color = '#000';
+                
+                if(deckContainer) {
+                    deckContainer.style.transition = 'background-color 0.4s ease';
+                    deckContainer.style.backgroundColor = ''; 
+                }
+                
+                setTimeout(resetSwitch, 400);
+            }
+        }
+        hasStartedDrag = false;
+    };
+
+    mainBtn.addEventListener('touchend', handleEnd);
+    mainBtn.addEventListener('touchcancel', handleEnd);
 }
