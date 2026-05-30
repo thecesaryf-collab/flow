@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - Flow Mini</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --bg-color: #f2f2f7; 
+            --surface-color: #ffffff; 
+            --text-primary: #1d1d1f; 
+            --text-secondary: #86868b;
+            --primary-gradient: linear-gradient(135deg, #FFCC00 0%, #FF9500 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --border-radius-xl: 32px;
+            --shadow-float: 0 12px 40px rgba(255, 149, 0, 0.15);
+            --error: #FF3B30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif !important;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Fondo Líquido Animado de style.css */
+        .liquid-bg {
+            position: fixed;
+            bottom: -15vh;
+            left: -10vw;
+            width: 120vw;
+            height: 65vh;
+            background: radial-gradient(
+                ellipse at center 80%, 
+                rgba(255, 204, 0, 0.45) 0%, 
+                rgba(255, 149, 0, 0.25) 45%, 
+                transparent 70%
+            );
+            filter: blur(50px);
+            z-index: -1;
+            pointer-events: none;
+            animation: liquidOscillation 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes liquidOscillation {
+            0% { transform: translateY(0) scale(1) rotate(0deg); }
+            33% { transform: translateY(-4vh) scale(1.05) rotate(2deg); }
+            66% { transform: translateY(2vh) scale(0.95) rotate(-1deg); }
+            100% { transform: translateY(-2vh) scale(1.1) rotate(1deg); }
+        }
+
+        /* Tarjeta Glassmorphism */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            padding: 40px 30px;
+            border-radius: var(--border-radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-float), 0 0 0 1px rgba(255,255,255,0.5) inset;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            z-index: 10;
+            animation: popIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 32px;
+            letter-spacing: -1px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        /* Inputs de habitos.css */
+        input[type="text"], input[type="password"] {
+            width: 100%; 
+            padding: 18px 20px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(0,0,0,0.05); 
+            font-size: 18px; 
+            font-weight: 700; 
+            background: var(--surface-color); 
+            outline: none; 
+            transition: all 0.2s; 
+            color: var(--text-primary);
+        }
+
+        input:focus { 
+            border-color: #FF9500; 
+            box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1); 
+        }
+
+        input::placeholder {
+            color: rgba(0,0,0,0.25);
+            font-weight: 600;
+        }
+
+        /* Botón de entrenos.css */
+        .btn-primary { 
+            width: 100%; 
+            padding: 22px; 
+            border-radius: 16px; 
+            background: var(--primary-gradient); 
+            color: white; 
+            font-size: 19px; 
+            font-weight: 900; 
+            letter-spacing: -0.5px; 
+            border: none; 
+            margin-top: 10px; 
+            cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(255, 204, 0, 0.3); 
+            transition: all 0.2s; 
+        }
+
+        .btn-primary:active { 
+            transform: scale(0.96); 
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.2); 
+            filter: brightness(0.85) saturate(1.1);
+        }
+
+        #error-msg {
+            color: var(--error);
+            font-size: 15px;
+            margin-top: 16px;
+            min-height: 20px;
+            font-weight: 700;
+            animation: fadeIn 0.3s forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="liquid-bg"></div>
+
+    <div class="login-card">
+        <h2 class="gradient-text">Flow Mini</h2>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Usuario" autocomplete="off" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Contraseña" required>
+            </div>
+            
+            <button type="submit" class="btn-primary">Entrar</button>
+            
+            <div id="error-msg"></div>
+        </form>
+    </div>
+
+    <script>
+        // Lógica de inicio de sesión
+        const validUsers = {
+            "cesaryf": "1234",
+            "dianamn": "1234"
+        };
+
+        const form = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const userVal = document.getElementById('username').value.trim().toLowerCase();
+            const passVal = document.getElementById('password').value;
+
+            if (validUsers[userVal] && validUsers[userVal] === passVal) {
+                // Efecto de feedback visual rápido antes de redirigir
+                document.querySelector('.btn-primary').textContent = "Cargando...";
+                
+                localStorage.setItem('flow_mini_user', userVal);
+                
+                // Redirige al instante (cambia 'index.html' por tu página real)
+                setTimeout(() => {
+                    window.location.href = 'index.html'; 
+                }, 300);
+            } else {
+                errorMsg.textContent = "Usuario o contraseña incorrectos.";
+                document.getElementById('password').value = '';
+                
+                // Efecto de error en el contenedor (temblor)
+                const card = document.querySelector('.login-card');
+                card.style.transform = 'translateX(-10px)';
+                setTimeout(() => card.style.transform = 'translateX(10px)', 50);
+                setTimeout(() => card.style.transform = 'translateX(-10px)', 100);
+                setTimeout(() => card.style.transform = 'translateX(0)', 150);
+            }
+        });
+
+        // Autoredirección si ya hay sesión
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('flow_mini_user')) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
