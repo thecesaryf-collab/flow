@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FlowApp - Entrenamientos</title>
+    <title>Flow - Entrenamientos</title>
+    
+    <script>
+        if (!localStorage.getItem('flow_mini_user')) {
+            window.location.replace('logchapuzaprovisional.html');
+        }
+    </script>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="entrenos.css">
 </head>
