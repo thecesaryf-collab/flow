@@ -63,16 +63,26 @@ async function syncData() {
             body: JSON.stringify({ action: "syncro_entrenos", user: USERNAME }) 
         });
         const rawData = await response.json(); 
-        
-        // LA MAGIA AQUÍ: Si rawData[0] no existe, usamos un objeto vacío {}
         const payload = rawData[0] || {}; 
+
+        // --- SOLUCIÓN: Filtrar datos vacíos antes de cargarlos al estado ---
         
-        state.libExercises = payload.lib_ej || [];
-        state.libRoutines = payload.lib_entrenos || [];
-        state.logs = payload.log_entrenos || [];
-        
-        // Ahora no crasheará y lanzará tu pantalla especial correctamente
-        checkTodayWorkout(); 
+        // 1. Filtrar ejercicios: Asegurar que tengan ID y nombre
+        state.libExercises = Array.isArray(payload.lib_ej) 
+            ? payload.lib_ej.filter(e => e.ID_ejercicio && e.Nombre_ejercicio) 
+            : [];
+
+        // 2. Filtrar rutinas: Asegurar que tengan ID y nombre
+        state.libRoutines = Array.isArray(payload.lib_entrenos) 
+            ? payload.lib_entrenos.filter(r => r.ID_entreno && r.Nombre_rutina) 
+            : [];
+
+        // 3. Filtrar logs: Asegurar que tengan ID de entreno y fecha
+        state.logs = Array.isArray(payload.log_entrenos) 
+            ? payload.log_entrenos.filter(l => l.ID_entreno && l.Fecha_log_entreno) 
+            : [];
+
+        checkTodayWorkout();
     } catch (e) { showToast("Error sincronizando (Timeout/Red)"); }
 }
 
@@ -153,6 +163,8 @@ function showStartScreen(isPast) {
     }
     renderStartButtons();
 }
+
+
 
 function skipToLogs() {
     document.getElementById('start-screen').classList.add('hidden');
@@ -1490,7 +1502,6 @@ function setupDeleteSwitch() {
     mainBtn.addEventListener('touchend', handleEnd);
     mainBtn.addEventListener('touchcancel', handleEnd);
 }
-
 // --- FUNCIÓN CERRAR SESIÓN ---
 function cerrarSesion() {
     // 1. Borramos el usuario guardado
