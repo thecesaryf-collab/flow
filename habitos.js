@@ -731,3 +731,12 @@ function simulatePreviewSlot() {
     void card.offsetWidth; // Reflow para reiniciar la animación
     card.classList.add('success-pop');
 }
+
+
+// --- FUNCIÓN CERRAR SESIÓN ---
+function cerrarSesion() {
+    // 1. Borramos el usuario guardado
+    localStorage.removeItem('flow_mini_user');
+    // 2. Redirigimos al login
+    window.location.replace('logchapuzaprovisional.html');
+}
