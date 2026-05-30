@@ -198,10 +198,50 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 .edge-indicator { position: absolute; top: 50%; transform: translateY(-50%); height: 220px; width: 100px; z-index: 1050; display: flex; align-items: center; opacity: 0; pointer-events: none; transition: background-color 0.2s ease; }
 .edge-indicator.nope { left: -100px; border-radius: 0 150px 150px 0; background-color: rgba(255, 59, 48, 0.95); justify-content: flex-end; padding-right: 24px; box-shadow: inset -10px 0 30px rgba(0,0,0,0.1); }
 .edge-indicator.like { right: -100px; border-radius: 150px 0 0 150px; background-color: rgba(52, 199, 89, 0.95); justify-content: flex-start; padding-left: 24px; box-shadow: inset 10px 0 30px rgba(0,0,0,0.1); }
-.deck-header-btns { position: absolute; top: 15px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; z-index: 1200; pointer-events: none; }
-.deck-btn { pointer-events: auto; color: white; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform 0.2s; border: none; text-transform: uppercase; letter-spacing: 1px; }
-.deck-btn.reset { background: rgba(255, 59, 48, 0.7); }
-.deck-btn:active { transform: scale(0.9); }
+.deck-header-btns { 
+    position: absolute; 
+    top: 20px; 
+    right: 20px; /* ¡Alineado a la derecha! */
+    display: flex; 
+    gap: 12px;  
+    z-index: 1200; 
+    pointer-events: none; 
+    width: auto;
+    padding: 0;
+}
+
+.deck-icon-btn { 
+    pointer-events: auto; 
+    color: white; 
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    width: 44px; 
+    height: 44px; 
+    border-radius: 50%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); 
+    border: 1px solid rgba(255, 255, 255, 0.15); 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.deck-icon-btn:active { 
+    transform: scale(0.85); 
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.deck-icon-btn.reset { 
+    color: #FF3B30; 
+    background: rgba(255, 59, 48, 0.15); 
+    border-color: rgba(255, 59, 48, 0.25);
+}
+
+.deck-icon-btn.reset:active {
+    background: rgba(255, 59, 48, 0.25); 
+}
 
 @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -512,4 +552,120 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 @keyframes cascadeLoad {
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
+}
+/* =========================================
+   INTERACCIÓN: SLIDE TO DELETE (LONG PRESS)
+   ========================================= */
+.delete-switch-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 44px;
+    z-index: 1200;
+    pointer-events: auto;
+    
+    /* ¡NUEVO! Bloqueo de selección para que no salga el menú al mantener pulsado */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.delete-switch-track {
+    position: absolute;
+    right: 0;
+    height: 44px;
+    width: 44px; /* Empieza del tamaño del botón */
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Estado Activo: La pastilla se estira hasta el centro */
+.delete-switch-wrapper.active-switch .delete-switch-track {
+    width: 55vw; /* Ocupa hasta el medio de la pantalla */
+    max-width: 260px;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.95); /* Se vuelve blanca opaca */
+}
+
+.delete-switch-track .slide-text {
+    color: #8E8E93;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.delete-switch-wrapper.active-switch .delete-switch-track .slide-text {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.2s;
+}
+
+#deck-main-btn {
+    position: relative;
+    z-index: 2;
+    transition: background 0.3s, transform 0.3s, border 0.3s;
+    
+    /* ¡NUEVO! Bloqueo en el propio botón también por seguridad en iOS/Android */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* El botón se vuelve blanco y sólido al mantener pulsado */
+.delete-switch-wrapper.pre-switch #deck-main-btn {
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-color: transparent;
+    animation: popSwitch 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#deck-main-btn svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease, color 0.1s;
+}
+
+#deck-main-btn .icon-trash {
+    opacity: 0;
+    color: #000000; /* Papelera negra al principio */
+}
+/* =========================================
+   EFECTOS PREMIUM DEL SWITCH (POP Y FONDO)
+   ========================================= */
+#deck-container {
+    transition: background-color 0.4s ease; /* Permite que el fondo vuelva a negro suavemente */
+}
+
+@keyframes popSwitch {
+    0% { scale: 1; }
+    50% { scale: 1.2; }
+    100% { scale: 1.05; }
+}
+
+/* Modificamos el estado activo que ya tenías para usar la nueva animación Pop */
+.delete-switch-wrapper.active-switch #deck-main-btn {
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-color: transparent;
+    /* Reemplazamos el "transform: scale(1.05);" estático por la animación dinámica */
+    animation: popSwitch 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
