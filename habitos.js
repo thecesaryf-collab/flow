@@ -1,5 +1,6 @@
+// Configuración
+const USERNAME = localStorage.getItem('flow_mini_user');
 const WEBHOOK_URL = 'https://automations-n8n.b8vwcm.easypanel.host/webhook/FLOW_mini';
-const USERNAME = 'cesaryf';
 
 const ICONS = {
     generico: { 
