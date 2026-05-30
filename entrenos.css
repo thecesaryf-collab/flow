@@ -331,15 +331,16 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
 
 /* Nombres abreviados debajo */
 .mosaic-thumb-wrapper {
-    position: relative; /* Evita que los textos ocultos salgan volando */
-    flex: 1;
+    position: relative;
+    /* La magia: Calcula el ancho basado en la variable --max-cols. 
+       El -12px es para restar el gap entre elementos */
+    flex: 0 0 calc((100% - ((var(--max-cols, 4) - 1) * 12px)) / var(--max-cols, 4));
+    max-width: calc((100% - ((var(--max-cols, 4) - 1) * 12px)) / var(--max-cols, 4));
     min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: flex 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                opacity 0.4s ease, margin 0.5s ease, padding 0.5s ease, gap 0.4s ease;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
 }
 
@@ -668,4 +669,13 @@ input:focus { border-color: #FF9500; box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.1
     border-color: transparent;
     /* Reemplazamos el "transform: scale(1.05);" estático por la animación dinámica */
     animation: popSwitch 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+/* --- FIX SCROLL EN LOGS --- */
+.log-edit-input:disabled {
+    pointer-events: none; /* Evita que el input secuestre el toque táctil si no se está editando */
+}
+
+input[type="text"], input[type="number"] { 
+    /* ... (tus estilos existentes) ... */
+    touch-action: pan-y manipulation; /* Permite explícitamente el scroll vertical sobre inputs */
 }
