@@ -134,8 +134,8 @@ function checkTodayWorkout() {
             fabItem.style.opacity = '0.5';
         } else {
             if(fabLabel) fabLabel.innerText = state.activeWorkout ? "Continuar entrenamiento" : "Iniciar entrenamiento";
-            fabItem.style.pointerEvents = 'auto';
-            fabItem.style.opacity = '1';
+            fabItem.style.pointerEvents = '';
+            fabItem.style.opacity = '';
         }
     }
 
