@@ -306,6 +306,7 @@ function shortenName(name) {
 
 function calculateRows(totalCount) {
     if (totalCount <= 4) return [totalCount];
+    if (totalCount === 5) return [3, 2]; /* <--- NUEVO: Reparto homogéneo para 5 ítems */
     if (totalCount === 6) return [3, 3];
     if (totalCount === 8) return [4, 4];
     if (totalCount === 9) return [3, 3, 3];
@@ -498,6 +499,10 @@ function renderLogs() {
         const totalCount = validLogsList.length;
         const rowLayout = calculateRows(totalCount);
         
+        // Calculamos el número máximo de columnas en esta rutina concreta.
+        // Forzamos un mínimo de 2 para que si hay 1 solo ejercicio, ocupe como si hubieran 2.
+        const maxCols = Math.max(2, ...rowLayout);
+                
         let overallIndex = 0;
         rowLayout.forEach((count, rowIndex) => {
             let rowThumbsHtml = '';
@@ -529,7 +534,7 @@ function renderLogs() {
                 <div class="list-view-container ${state.logViewMode === 'list' ? '' : 'hidden'}">
                     ${listHtml}
                 </div>
-                <div id="mosaic-container-${rutinaId}" class="mosaic-view-container ${state.logViewMode === 'mosaic' ? '' : 'hidden'}">
+                <div id="mosaic-container-${rutinaId}" class="mosaic-view-container ${state.logViewMode === 'mosaic' ? '' : 'hidden'}" style="--max-cols: ${maxCols};">
                     ${mosaicGridRowsHtml}
                     <div class="mosaic-bodies-container">
                         ${mosaicBodiesHtml}
@@ -1061,7 +1066,9 @@ function createCardHtml(exercise, statusClass, index) {
 
 function setupDynamicSets(cardIndex) {
     for(let i=1; i<=5; i++) { 
-        const repsIn = document.getElementById(`reps-${cardIndex}-${i}`), kgIn = document.getElementById(`kg-${cardIndex}-${i}`), row = document.getElementById(`row-${cardIndex}-${i}`);
+        const repsIn = document.getElementById(`reps-${cardIndex}-${i}`), 
+              kgIn = document.getElementById(`kg-${cardIndex}-${i}`), 
+              row = document.getElementById(`row-${cardIndex}-${i}`);
         
         const makeActive = () => { 
             document.querySelectorAll('.serie-row').forEach(r => r.classList.remove('active-input')); 
@@ -1083,6 +1090,52 @@ function setupDynamicSets(cardIndex) {
         
         if(repsIn) repsIn.addEventListener('input', checkNext); 
         if(kgIn) kgIn.addEventListener('input', checkNext);
+
+        // --- NUEVO: ATAJOS DE TECLADO (ESPACIO Y ENTER) ---
+        const handleKeyDown = (e, type) => {
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault(); // Evita que se escriba el espacio en blanco
+                if (type === 'reps' && kgIn) {
+                    kgIn.focus();
+                } else if (type === 'kg' && i < 5) {
+                    const nextReps = document.getElementById(`reps-${cardIndex}-${i+1}`);
+                    const nextRow = document.getElementById(`row-${cardIndex}-${i+1}`);
+                    if (nextRow && nextRow.classList.contains('hidden-set')) {
+                        nextRow.classList.remove('hidden-set');
+                        nextRow.classList.add('show-anim');
+                    }
+                    if (nextReps) nextReps.focus();
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (i < 5) {
+                    const nextReps = document.getElementById(`reps-${cardIndex}-${i+1}`);
+                    const nextKg = document.getElementById(`kg-${cardIndex}-${i+1}`);
+                    const nextRow = document.getElementById(`row-${cardIndex}-${i+1}`);
+
+                    // Desbloquea la siguiente serie
+                    if (nextRow && nextRow.classList.contains('hidden-set')) {
+                        nextRow.classList.remove('hidden-set');
+                        nextRow.classList.add('show-anim');
+                    }
+
+                    // Copia y pega los valores
+                    if (nextReps && repsIn.value !== "") nextReps.value = repsIn.value;
+                    if (nextKg && kgIn.value !== "") nextKg.value = kgIn.value;
+
+                    // Fuerza la actualización para la validación visual si la tienes
+                    if (nextReps) nextReps.dispatchEvent(new Event('input'));
+                    if (nextKg) nextKg.dispatchEvent(new Event('input'));
+
+                    // Mueve el foco a la misma columna de la fila de abajo
+                    if (type === 'reps' && nextReps) nextReps.focus();
+                    else if (type === 'kg' && nextKg) nextKg.focus();
+                }
+            }
+        };
+
+        if(repsIn) repsIn.addEventListener('keydown', (e) => handleKeyDown(e, 'reps'));
+        if(kgIn) kgIn.addEventListener('keydown', (e) => handleKeyDown(e, 'kg'));
     }
 }
 
