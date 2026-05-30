@@ -1,4 +1,4 @@
-// entrenos.js - DISEÑO DISRUPTIVO ULTRA PREMIUM 2026 - V2 (FIXED)
+// entrenos.js - DISEÑO DISRUPTIVO ULTRA PREMIUM 2026 - V2
 // Configuración
 const USERNAME = localStorage.getItem('flow_mini_user');
 const WEBHOOK_URL = 'https://automations-n8n.b8vwcm.easypanel.host/webhook/FLOW_mini';
