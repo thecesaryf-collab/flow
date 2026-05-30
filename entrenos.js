@@ -1,6 +1,7 @@
 // entrenos.js - DISEÑO DISRUPTIVO ULTRA PREMIUM 2026 - V2 (FIXED)
+// Configuración
+const USERNAME = localStorage.getItem('flow_mini_user');
 const WEBHOOK_URL = 'https://automations-n8n.b8vwcm.easypanel.host/webhook/FLOW_mini';
-const USERNAME = 'cesaryf';
 const COLORS = [
   // --- GRUPO 1: Muy Vibrantes y Saturados ---
   '#E06C3E', // 1er Terracota
