@@ -918,21 +918,37 @@ async function startWorkout(routineId) {
 function closeDeck() { document.getElementById('deck-container').classList.add('hidden'); checkTodayWorkout(); }
 
 async function resetWorkout() {
-    if(!confirm("¿Deseas resetear el entreno de hoy?")) return;
+    if(!confirm("¿Deseas eliminar/resetear el entreno de hoy?")) return;
     try {
-        showToast("Reseteando...");
+        showToast("Eliminando...");
         const res = await fetchWithTimeout(WEBHOOK_URL, { 
             method: 'POST', 
             body: JSON.stringify({ 
-                action: "reset_entreno", 
+                action: "eliminar_registro", 
                 user: USERNAME, 
                 entreno_id: state.activeWorkout, 
                 date: getLocalISODate(state.referenceDate) 
             }) 
         });
         if(!res.ok) throw new Error();
-        state.currentCardIndex = 0; document.getElementById('deck-container').classList.add('hidden'); checkTodayWorkout();
-    } catch(e) { showToast("Error al resetear."); }
+        
+        // --- 1. ELIMINAR LOS REGISTROS DEL ESTADO LOCAL ---
+        const todayStr = getLocalISODate(state.referenceDate);
+        state.logs = state.logs.filter(l => !(l.ID_entreno === state.activeWorkout && l.Fecha_log_entreno === todayStr));
+        
+        // --- 2. LIMPIAR EL ENTRENAMIENTO ACTIVO ---
+        state.activeWorkout = null;
+        state.currentCardIndex = 0; 
+        
+        // 3. Ocultar la pantalla de ejecución (deck)
+        document.getElementById('deck-container').classList.add('hidden'); 
+        
+        // 4. Recargar la interfaz (te llevará a "Qué toca hoy" o dejará la lista vacía)
+        checkTodayWorkout();
+
+    } catch(e) { 
+        showToast("Error al resetear/eliminar."); 
+    }
 }
 
 function renderDeck() {
