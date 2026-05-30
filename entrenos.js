@@ -63,11 +63,16 @@ async function syncData() {
             body: JSON.stringify({ action: "syncro_entrenos", user: USERNAME }) 
         });
         const rawData = await response.json(); 
-        const payload = rawData[0];
+        
+        // LA MAGIA AQUÍ: Si rawData[0] no existe, usamos un objeto vacío {}
+        const payload = rawData[0] || {}; 
+        
         state.libExercises = payload.lib_ej || [];
         state.libRoutines = payload.lib_entrenos || [];
         state.logs = payload.log_entrenos || [];
-        checkTodayWorkout();
+        
+        // Ahora no crasheará y lanzará tu pantalla especial correctamente
+        checkTodayWorkout(); 
     } catch (e) { showToast("Error sincronizando (Timeout/Red)"); }
 }
 
