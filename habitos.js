@@ -99,12 +99,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function syncData() {
     try {
-        const response = await fetchWithTimeout(WEBHOOK_URL, { method: 'POST', body: JSON.stringify({ action: "syncro_habitos", user: USERNAME }) });
-        const rawData = await response.json(); const payload = rawData[0];
-        if (payload && payload.lib_habitos && payload.lib_habitos.length > 0) {
+        const response = await fetchWithTimeout(WEBHOOK_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: "syncro_habitos", user: USERNAME }) 
+        });
+        const rawData = await response.json(); 
+        const payload = rawData[0] || {}; // Misma protección por si acaso
+        
+        if (payload.lib_habitos && payload.lib_habitos.length > 0) {
             state.library = Array.from(new Map(payload.lib_habitos.map(item => [item.ID_habito, item])).values());
-            state.logs = payload.logs_habitos || []; renderHabits();
         } else {
+            state.library = [];
+        }
+        state.logs = payload.logs_habitos || []; 
+        
+        // 1. Dibuja siempre el fondo y la interfaz vacía para que no quede en blanco
+        renderHabits(); 
+        
+        // 2. Si no hay hábitos, lanza el formulario por encima (tu "interfaz especial")
+        if (state.library.length === 0) {
             openCreateForm();
         }
     } catch (e) { showToast("Error de conexión al sincronizar."); }
