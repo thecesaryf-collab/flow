@@ -2,7 +2,7 @@
 
 :root {
     /* Fondos muy claros y limpios estilo iOS */
-    --bg-color: #f2f2f7; /* Gris muuuuy clarito para el fondo principal */
+    --bg-color: #ffffff; /* Gris muuuuy clarito para el fondo principal */
     --surface-color: #ffffff; /* Blanco puro para elementos sobre el fondo */
     
     /* Textos oscuros pero no negros puros para relajar la vista */
@@ -65,8 +65,8 @@ body {
     max-width: 500px;
     margin: 0 auto;
     position: relative;
-    background-color: var(--surface-color); /* El contenedor central es blanco */
-    box-shadow: 0 0 40px rgba(0,0,0,0.03); /* Separación sutil si se ve en PC */
+    background-color: transparent; /* Cambiado para dejar ver el fondo líquido */
+    box-shadow: none; /* Quitamos la sombra estática */
 }
 
 header {
@@ -109,13 +109,13 @@ main::-webkit-scrollbar { width: 6px; }
 main::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
 h1#greeting {
-    font-size: 32px;
-    margin-bottom: 32px;
-    font-weight: 800;
-    letter-spacing: -1px;
+    font-size: 42px; /* Más grande (antes 32px) */
+    line-height: 1.1;
+    margin-bottom: 8px; /* Reducido para acercarlo al subtítulo */
+    font-weight: 900;
+    letter-spacing: -1.5px;
     color: var(--text-primary);
 }
-
 /* Interfaz Chat (Limpia y Apple-like) */
 .chat-container {
     display: flex;
@@ -138,6 +138,16 @@ h1#greeting {
     background-color: var(--bubble-system);
     color: var(--text-primary);
     border-radius: var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg) 6px;
+}
+.subtitle-thoughts {
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--glass-border);
 }
 
 /* Burbuja USUARIO (Degradado amarillo con texto oscuro para contraste premium) */
@@ -331,4 +341,35 @@ h1#greeting {
 .nav-links li:hover:not(.active) { 
     background: rgba(0,0,0,0.02); color: var(--text-primary); transform: translateX(6px); 
 }
+
+/* ====================================================
+   FONDO LÍQUIDO ANIMADO
+   ==================================================== */
+.liquid-bg {
+    position: fixed;
+    bottom: -15vh;
+    left: -10vw;
+    width: 120vw; /* Más ancho que la pantalla para que el movimiento sea fluido */
+    height: 65vh; /* Ocupa la mitad inferior */
+    /* Degradado radial difuminado en tonos cálidos */
+    background: radial-gradient(
+        ellipse at center 80%, 
+        rgba(255, 204, 0, 0.45) 0%, 
+        rgba(255, 149, 0, 0.25) 45%, 
+        transparent 70%
+    );
+    filter: blur(50px); /* Efecto mancha / líquido difuminado */
+    z-index: -1; /* Se queda al fondo del todo */
+    pointer-events: none; /* No interfiere con los clics */
+    animation: liquidOscillation 12s ease-in-out infinite alternate;
+}
+
+@keyframes liquidOscillation {
+    0% { transform: translateY(0) scale(1) rotate(0deg); }
+    33% { transform: translateY(-4vh) scale(1.05) rotate(2deg); }
+    66% { transform: translateY(2vh) scale(0.95) rotate(-1deg); }
+    100% { transform: translateY(-2vh) scale(1.1) rotate(1deg); }
+}
+
+
 
