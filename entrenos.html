@@ -145,10 +145,17 @@
         </div>
 
         <div id="deck-container" class="hidden">
-            <div class="deck-header-btns">
-                <button class="deck-btn reset" onclick="resetWorkout()">Reset</button>
-                <button class="deck-btn" onclick="closeDeck()">Salir</button>
-            </div>
+            <div class="deck-header-btns" style="right: 20px;">
+    <div id="delete-switch-wrapper" class="delete-switch-wrapper">
+        <div id="delete-switch-track" class="delete-switch-track">
+            <span class="slide-text">← Desliza para eliminar</span>
+        </div>
+        <button id="deck-main-btn" class="deck-icon-btn">
+            <svg class="icon-x" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg class="icon-trash" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+    </div>
+</div>
             
             <div id="edge-left" class="edge-indicator nope">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
