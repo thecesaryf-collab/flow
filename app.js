@@ -1,6 +1,7 @@
 // Configuración
+// Configuración
+const USERNAME = localStorage.getItem('flow_mini_user');
 const WEBHOOK_URL = 'https://automations-n8n.b8vwcm.easypanel.host/webhook/FLOW_mini';
-const USERNAME = 'cesaryf'; // ¡Corregido! Ahora coincide con entrenos.js y habitos.js
 const DAYS_ES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 // Elementos del DOM
