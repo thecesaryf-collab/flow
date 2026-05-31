@@ -673,20 +673,42 @@ function validateFormChanges() {
 
 function setupUIEvents() {
     const searchInput = document.getElementById('exercise-search');
+    const resultsBox = document.getElementById('search-results');
+
+    // --- NUEVA LÓGICA 1: Función para limpiar texto ---
+    // Convierte a minúsculas, elimina tildes/acentos y reemplaza los paréntesis por espacios
+    const normalizeText = (text) => {
+        if (!text) return "";
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Elimina acentos
+                   .replace(/[()]/g, " ") // Elimina paréntesis
+                   .toLowerCase()
+                   .trim();
+    };
+
+    // --- NUEVA LÓGICA 2: Búsqueda Permisiva ---
     searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        const resultsBox = document.getElementById('search-results');
-        if(term.length < 2) { resultsBox.classList.add('hidden'); return; }
+        const rawTerm = e.target.value.trim();
+        if(rawTerm.length < 2) { resultsBox.classList.add('hidden'); return; }
         
+        // Dividimos la búsqueda en palabras individuales ("curl", "maquina")
+        const searchWords = normalizeText(rawTerm).split(/\s+/).filter(w => w.length > 0);
+
         const matches = state.libExercises.filter(ex => {
-            const muscleGroup = (ex.ID_ejercicio.split('_')[1] || '').toLowerCase();
-            const searchString = `${ex.Nombre_ejercicio || ''} ${ex.Nombre_ejercicio_alt_1 || ''} ${ex.Nombre_ejercicio_alt_2 || ''} ${ex.Nombre_ejercicio_alt_3 || ''} ${ex.Nombre_ejercicio_alt_4 || ''} ${ex.Nombre_ejercicio_alt_5 || ''} ${muscleGroup}`.toLowerCase();
-            return searchString.includes(term);
+            const muscleGroup = (ex.ID_ejercicio.split('_')[1] || '');
+            // Agrupamos todos los nombres posibles del ejercicio
+            const fullText = `${ex.Nombre_ejercicio || ''} ${ex.Nombre_ejercicio_alt_1 || ''} ${ex.Nombre_ejercicio_alt_2 || ''} ${ex.Nombre_ejercicio_alt_3 || ''} ${ex.Nombre_ejercicio_alt_4 || ''} ${ex.Nombre_ejercicio_alt_5 || ''} ${muscleGroup}`;
+            
+            const normalizedTarget = normalizeText(fullText);
+            
+            // Verificamos que TODAS las palabras que escribió el usuario existan en algún lugar del nombre
+            // Así, si escribe "curl maquina", coincidirá con "Curl Bíceps (Máquina)"
+            return searchWords.every(word => normalizedTarget.includes(word));
         });
 
         resultsBox.innerHTML = '';
-        if (matches.length === 0) { resultsBox.innerHTML = '<div class="search-item" style="color: var(--text-secondary);">No hay resultados</div>'; } 
-        else {
+        if (matches.length === 0) { 
+            resultsBox.innerHTML = '<div class="search-item" style="color: var(--text-secondary);">No hay resultados</div>'; 
+        } else {
             matches.forEach(ex => {
                 const div = document.createElement('div'); div.className = 'search-item'; div.innerHTML = `<strong>${ex.Nombre_ejercicio}</strong>`;
                 div.onclick = () => { addExerciseToRoutine(ex); searchInput.value = ''; resultsBox.classList.add('hidden'); };
@@ -696,6 +718,25 @@ function setupUIEvents() {
         resultsBox.classList.remove('hidden');
     });
 
+    // --- NUEVA LÓGICA 3: Clic fuera para cerrar, clic dentro para abrir ---
+    
+    // Si el usuario vuelve a hacer foco en el input y ya había algo escrito, mostramos las sugerencias
+    searchInput.addEventListener('focus', (e) => {
+        if (e.target.value.trim().length >= 2 && resultsBox.innerHTML !== '') {
+            resultsBox.classList.remove('hidden');
+        }
+    });
+
+    // Detectamos cualquier clic en la pantalla
+    document.addEventListener('click', (e) => {
+        const searchContainer = document.querySelector('.search-box');
+        // Si el clic NO fue dentro del contenedor del buscador, ocultamos las sugerencias
+        if (searchContainer && !searchContainer.contains(e.target)) {
+            resultsBox.classList.add('hidden');
+        }
+    });
+
+    // --- CÓDIGO ORIGINAL INTACTO DE LA FUNCIÓN ---
     document.getElementById('routine-name').addEventListener('input', (e) => {
         currentRoutine.nombre = e.target.value;
         if(currentRoutine.nombre.length >= 3) document.getElementById('step-r-color').classList.add('active');
@@ -716,7 +757,6 @@ function setupUIEvents() {
         cp.appendChild(div);
     });
 }
-
 function addExerciseToRoutine(ex) { currentRoutine.ejercicios.push(ex); renderSelectedExercises(); validateFormChanges(); }
 
 function renderSelectedExercises() {
