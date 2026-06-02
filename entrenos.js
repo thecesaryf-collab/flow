@@ -1772,11 +1772,11 @@ function updateChart() {
 
     const parsedEx = JSON.parse(exVal);
     
-    // FIX 1: Convertir el "01" de la posición a "001" para que haga match con tu base de datos
+    // FIX 1: Convertir el "01" de la posición a "001" para que haga match
     const posNumber = parseInt(parsedEx.pos, 10);
     const posToMatch = `_ej${String(posNumber).padStart(3, '0')}`; 
     
-    // FIX 2: Limpiar las horas de la fecha de corte para evitar problemas de zona horaria
+    // Limpiar las horas de la fecha de corte
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - (state.weeks * 7));
     cutoffDate.setHours(0, 0, 0, 0); 
@@ -1804,7 +1804,7 @@ function updateChart() {
     let rawIntensidad = [];
 
     dataPoints.forEach(log => {
-        // Formato de etiqueta: DD-MM (volteamos tu YYYY-MM-DD)
+        // Formato de etiqueta: DD-MM
         const parts = log.Fecha_log_entreno.split('-');
         if(parts.length === 3) {
             labels.push(`${parts[2]}-${parts[1]}`);
@@ -1812,7 +1812,9 @@ function updateChart() {
             labels.push(log.Fecha_log_entreno.substring(5)); 
         }
         
-        let maxPeso = 0, sumPeso = 0, sumRepes = 0;
+        let maxPeso = 0;
+        let sumVolumen = 0; // Sumatorio de (kg * reps)
+        let validSets = 0;  // Contador de series reales de ese log
 
         for(let i=1; i<=5; i++) {
             let p = parseFloat(log[`Log_peso_serie_0${i}`]);
@@ -1821,14 +1823,18 @@ function updateChart() {
             // Solo contamos la serie si tiene repeticiones válidas
             if(!isNaN(p) && !isNaN(r) && r > 0) {
                 if (p > maxPeso) maxPeso = p;
-                sumPeso += p;
-                sumRepes += r;
+                
+                // Nueva fórmula de intensidad: sumamos (Kg x Repeticiones)
+                sumVolumen += (p * r);
+                // Sumamos 1 al contador de series
+                validSets++;
             }
         }
         
         pesoData.push(maxPeso);
-        // Intensidad = total kg / total repes
-        let intensidadAbs = sumRepes > 0 ? (sumPeso / sumRepes) : 0;
+        
+        // Intensidad real = Sumatorio de (kg * reps) dividido entre el número de series
+        let intensidadAbs = validSets > 0 ? (sumVolumen / validSets) : 0;
         rawIntensidad.push(intensidadAbs);
     });
 
