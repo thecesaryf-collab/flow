@@ -148,7 +148,7 @@ function checkTodayWorkout() {
             const isSelected = getLocalISODate(tempD) === getLocalISODate(state.referenceDate);
             container.innerHTML += `<div class="day-item ${isSelected ? 'active' : ''}" onclick="updateReference('${tempD.toISOString()}', this)"><span class="day-num">${tempD.getDate()}</span><span class="day-name">${daysNames[tempD.getDay()]}</span></div>`;
         }
-    }
+    }}
 
 function showStartScreen(isPast) {
     document.getElementById('start-screen').classList.remove('hidden');
