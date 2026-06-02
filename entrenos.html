@@ -223,9 +223,9 @@
             </div>
         </div>
 
-        <div class="chart-container" style="flex: 1; min-height: 220px; margin-top: 5px;">
+        <div class="chart-container" style="position: relative; flex: none; height: 220px; min-height: 220px; max-height: 220px; width: 100%; margin-top: 5px; overflow: hidden;">
             <div id="empty-state" class="empty-chart">Elige rutina y ejercicio para ver tu progreso.</div>
-            <canvas id="progressionChart"></canvas>
+            <canvas id="progressionChart" style="display: block; width: 100% !important; height: 100% !important;"></canvas>
         </div>
     </div>
 </div>
