@@ -140,11 +140,15 @@ function checkTodayWorkout() {
     }
 
     if (state.currentView === 'day') {
-        if (todayStr === refStr && todayLogs.length === 0 && !state.activeWorkout) {
-            showStartScreen(false);
-        } else { skipToLogs(); }
-    } else { skipToLogs(); }
-}
+        const daysNames = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+        for (let i = -14; i <= 0; i++) {
+            let tempD = new Date(d); // Base en la fecha seleccionada
+            tempD.setDate(d.getDate() + i); // ✅ Usamos d.getDate() en vez de new Date().getDate()
+            
+            const isSelected = getLocalISODate(tempD) === getLocalISODate(state.referenceDate);
+            container.innerHTML += `<div class="day-item ${isSelected ? 'active' : ''}" onclick="updateReference('${tempD.toISOString()}', this)"><span class="day-num">${tempD.getDate()}</span><span class="day-name">${daysNames[tempD.getDay()]}</span></div>`;
+        }
+    }
 
 function showStartScreen(isPast) {
     document.getElementById('start-screen').classList.remove('hidden');
