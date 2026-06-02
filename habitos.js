@@ -139,11 +139,19 @@ function renderPicker() {
     const container = document.getElementById('picker-container'); container.innerHTML = ''; const d = new Date(state.referenceDate);
     if (state.currentView === 'day') {
         const daysNames = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
-        for (let i = -14; i <= 0; i++) {
-            let tempD = new Date(d); tempD.setDate(new Date().getDate() + i); const dateStr = getLocalISODate(tempD); const isSelected = dateStr === getLocalISODate(state.referenceDate);
+        const today = new Date(); // El final de la lista SIEMPRE es hoy
+        
+        // Generamos los últimos 180 días (medio año de scroll hacia atrás)
+        // Puedes cambiar el -180 por -365 si quieres un año entero
+        for (let i = -180; i <= 0; i++) {
+            let tempD = new Date(today); 
+            tempD.setDate(today.getDate() + i); 
+            
+            const isSelected = getLocalISODate(tempD) === getLocalISODate(state.referenceDate);
             container.innerHTML += `<div class="day-item ${isSelected ? 'active' : ''}" onclick="updateReference('${tempD.toISOString()}', this)"><span class="day-num">${tempD.getDate()}</span><span class="day-name">${daysNames[tempD.getDay()]}</span></div>`;
         }
-    } else if (state.currentView === 'week') {
+    }
+     else if (state.currentView === 'week') {
         const currentMonday = getMonday(new Date());
         for (let i = -5; i <= 0; i++) {
             const start = new Date(currentMonday); start.setDate(start.getDate() + (i * 7)); const end = new Date(start); end.setDate(end.getDate() + 6); const isSelected = getLocalISODate(getMonday(state.referenceDate)) === getLocalISODate(start);
